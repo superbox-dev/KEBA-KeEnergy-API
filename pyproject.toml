@@ -1,0 +1,104 @@
+[build-system]
+requires = ["setuptools >= 65", "setuptools-scm >= 7"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "keba_keyenergy_api"
+description = "A thin Python wrapper for the KEBA KeEnergy API."
+readme = "README.md"
+authors = [
+    { name = "Michael Hacker", email = "mh@superbox.one" },
+]
+maintainers = [
+    { name = "Michael Hacker", email = "mh@superbox.one" },
+]
+license = {text = "Apache-2.0 license"}
+keywords = ["api", "keba", "keenergy"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3 :: Only",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+requires-python = ">= 3.11"
+dependencies = [
+    "aiohttp==3.8.5"
+]
+dynamic = ["version"]
+
+[project.urls]
+"Source code" = "https://github.com/superbox-dev/KEBA-KeEnergy-API"
+"Issue tracker" = "https://github.com/superbox-dev/KEBA-KeEnergy-API/issues"
+
+[project.optional-dependencies]
+build = [
+    "setuptools>=65.5.1",
+    "build==1.0.3",
+]
+audit = [
+    "pip-audit==2.6.1",
+]
+format = [
+    "black==23.9.1",
+]
+lint = [
+    "mypy==1.5.1",
+    "ruff==0.0.292",
+    "types-PyYAML==6.0.12.12",
+    "yamllint==1.32.0",
+]
+tests = [
+    "coverage==7.3.2",
+    "coverage-badge==1.1.0",
+    "pytest==7.4.2",
+    "pytest-asyncio==0.21.1",
+    "pytest-cov==4.1.0",
+    "pytest-xdist[psutil]==3.3.1",
+]
+
+[tool.setuptools]
+packages = ["keba_keyenergy_api"]
+
+[tool.setuptools_scm]
+write_to = "keba_keyenergy_api/version.py"
+
+[tool.black]
+line-length = 120
+target-version = ["py310", "py311"]
+
+[tool.mypy]
+strict = true
+python_version = "3.10"
+ignore_missing_imports = true
+junit_xml = "reports/mypy.xml"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+select = ["ALL"]
+ignore = [
+]
+
+[tool.pytest.ini_options]
+log_cli = true
+log_cli_level = "DEBUG"
+log_cli_format = "%(levelname)-8s | %(asctime)s: %(message)s"
+# https://docs.pytest.org/en/latest/reference/reference.html#ini-options-ref
+addopts = "--color=yes --exitfirst --failed-first --strict-config --strict-markers --junitxml=reports/pytest.xml"
+
+[tool.coverage.run] # https://coverage.readthedocs.io/en/latest/config.html#run
+branch = false
+
+[tool.coverage.report] # https://coverage.readthedocs.io/en/latest/config.html#report
+fail_under = 95
+show_missing = true
+skip_covered = true
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "@(abc\\.)?abstractmethod",
+]
