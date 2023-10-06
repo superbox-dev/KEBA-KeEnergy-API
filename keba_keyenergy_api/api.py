@@ -1,5 +1,4 @@
 """Client to interact with KEBA KeEnergy API."""
-import asyncio
 import json
 
 from aiohttp import ClientSession
@@ -24,22 +23,11 @@ class KeEnergyAPI(BaseEndpoint):
 
         super().__init__(payload_type="APPL.CtrlAppl.sParam", base_url=base_url, session=session)
 
-    async def get_outdoor_temperature(self) -> float:
+    async def get_outdoor_temperature(self) -> float | None:
         """Get outdoor temperature."""
         payload: dict[str, str] = {
             "name": f"{self._payload_type}.outdoorTemp.values.actValue",
         }
 
-        data: list[dict[str, str]] = await self._post(payload=json.dumps([payload]))
-        return float(data[0]["value"])
-
-
-async def main() -> None:
-    """Test."""
-    client = KeEnergyAPI(host="hc.superbox.one", ssl=True)
-    data = await client.heat_circuit.get_temperature()
-    print(data)
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
+        data: list[dict[str, str]] | dict[str, str] = await self._post(payload=json.dumps([payload]))
+        return float(data[0]["value"]) if isinstance(data, list) else None

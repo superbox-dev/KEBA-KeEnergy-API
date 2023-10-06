@@ -53,10 +53,10 @@ lint = [
     "yamllint==1.32.0",
 ]
 tests = [
+    "aioresponses==0.7.4",
     "coverage==7.3.2",
     "coverage-badge==1.1.0",
     "pytest==7.4.2",
-    "pytest-asyncio==0.21.1",
     "pytest-cov==4.1.0",
     "pytest-xdist[psutil]==3.3.1",
 ]
@@ -75,6 +75,7 @@ target-version = ["py310", "py311"]
 strict = true
 python_version = "3.10"
 ignore_missing_imports = true
+disallow_untyped_calls = false
 junit_xml = "reports/mypy.xml"
 
 [tool.ruff]
@@ -83,6 +84,7 @@ line-length = 120
 select = ["ALL"]
 ignore = [
     "ANN101",  # missing-type-self
+    "D",
     "D101",    # undocumented-public-class
     "D104",    # undocumented-public-package
     "D105",    # undocumented-magic-method
@@ -91,6 +93,7 @@ ignore = [
     "D213",    # multi-line-summary-second-line
     "ERA001",  # commented-out-code
     "I001",    # unsorted-imports
+    "S101",    # assert-used
 ]
 
 [tool.pytest.ini_options]

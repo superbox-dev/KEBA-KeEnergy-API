@@ -6,6 +6,7 @@ from aiohttp import ClientSession
 from aiohttp import ClientTimeout
 
 from keba_keyenergy_api.constants import API_DEFAULT_TIMEOUT
+from keba_keyenergy_api.error import APIError
 from keba_keyenergy_api.error import InvalidJsonError
 
 
@@ -24,14 +25,22 @@ class BaseEndpoint:
         )
 
         try:
-            async with session.post(f"{self._base_url}{endpoint}", data=payload) as resp:
-                data: list[dict[str, str]] = await resp.json(content_type="application/json;charset=utf-8")
+            async with session.post(f"{self._base_url}{endpoint if endpoint else ''}", data=payload) as resp:
+                data: list[dict[str, str]] = await resp.json(
+                    content_type="application/json;charset=utf-8",
+                )
         except JSONDecodeError as error:
             response_text = await resp.text()
             raise InvalidJsonError(response_text) from error
         finally:
             if not self._session:
                 await session.close()
+
+        if isinstance(data, dict) and "developerMessage" in data:
+            raise APIError(data["developerMessage"])
+
+        if isinstance(data, dict):
+            data = [data]
 
         return data
 
@@ -72,6 +81,13 @@ class HotWaterTank(BaseEndpoint):
             payload=self._get_payload(position, "param.reducedSetTempMax.value"),
         )
         return float(data[0]["value"])
+
+    async def set_min_temperature(self, temperature: int, position: int | None = None) -> None:
+        """Set minimum temperature."""
+        await self._post(
+            endpoint="?action=set",
+            payload=self._get_payload(position, "param.reducedSetTempMax.value", str(temperature)),
+        )
 
     async def get_max_temperature(self, position: int | None = None) -> float:
         """Get maximum temperature."""
@@ -181,17 +197,17 @@ class HeatCircuit(BaseEndpoint):
         data: list[dict[str, str]] = await self._post(payload=self._get_payload(position, "values.setValue"))
         return float(data[0]["value"])
 
-    async def set_temperature(self, temperature: int, position: int | None = None) -> None:
+    async def get_day_temperature(self, position: int | None = None) -> float:
+        """Get day temperature."""
+        data: list[dict[str, str]] = await self._post(payload=self._get_payload(position, "param.normalSetTemp"))
+        return float(data[0]["value"])
+
+    async def set_day_temperature(self, temperature: int, position: int | None = None) -> None:
         """Set temperature."""
         await self._post(
             endpoint="?action=set",
             payload=self._get_payload(position, "param.normalSetTemp", str(temperature)),
         )
-
-    async def get_day_temperature(self, position: int | None = None) -> float:
-        """Get day temperature."""
-        data: list[dict[str, str]] = await self._post(payload=self._get_payload(position, "param.normalSetTemp"))
-        return float(data[0]["value"])
 
     async def get_day_temperature_threshold(self, position: int | None = None) -> float:
         """Get day temperature threshold."""
@@ -200,7 +216,7 @@ class HeatCircuit(BaseEndpoint):
         )
         return float(data[0]["value"])
 
-    async def get_night_temperature(self, position: int | None = None) -> float:
+    async def get_night_temperature(self, position: int | None = None) -> float | None:
         """Get night temperature."""
         data: list[dict[str, str]] = await self._post(
             payload=self._get_payload(position, "param.reducedSetTemp"),
