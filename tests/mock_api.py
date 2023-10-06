@@ -8,7 +8,11 @@ from aioresponses import CallbackResult
 RE_ENDPOINTS = re.compile(r"^/var/readWriteVars(?:\?action=set)?$")
 
 
-def mock_kenergy_api_callback(url: yarl.URL, data: str, **kwargs: Any) -> CallbackResult:  # noqa: ARG001, ANN401
+def mock_kenergy_api_callback(  # noqa: C901, PLR0912, PLR0915
+    url: yarl.URL,
+    data: str,
+    **kwargs: Any,  # noqa: ARG001, ANN401
+) -> CallbackResult:
     """Mock the KEBA KeEnergy API."""
     m = RE_ENDPOINTS.match(url.path)
 
@@ -179,4 +183,5 @@ def mock_kenergy_api_callback(url: yarl.URL, data: str, **kwargs: Any) -> Callba
             if value
             else '[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.operatingMode", "value": "3"}]',
         )
+
     return result

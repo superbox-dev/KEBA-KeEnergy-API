@@ -23,11 +23,11 @@ class KeEnergyAPI(BaseEndpoint):
 
         super().__init__(payload_type="APPL.CtrlAppl.sParam", base_url=base_url, session=session)
 
-    async def get_outdoor_temperature(self) -> float | None:
+    async def get_outdoor_temperature(self) -> float:
         """Get outdoor temperature."""
         payload: dict[str, str] = {
             "name": f"{self._payload_type}.outdoorTemp.values.actValue",
         }
 
-        data: list[dict[str, str]] | dict[str, str] = await self._post(payload=json.dumps([payload]))
-        return float(data[0]["value"]) if isinstance(data, list) else None
+        data: list[dict[str, str]] = await self._post(payload=json.dumps([payload]))
+        return float(data[0]["value"])
