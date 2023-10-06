@@ -20,7 +20,7 @@ source .venv/bin/activate
 Install the development dependencies:
 
 ```bash
-pip install -e .[lint,format,audit,tests]
+pip install -e ".[lint,format,audit,tests]"
 ```
 
 ## Testing
