@@ -82,6 +82,15 @@ target-version = "py310"
 line-length = 120
 select = ["ALL"]
 ignore = [
+    "ANN101",  # missing-type-self
+    "D101",    # undocumented-public-class
+    "D104",    # undocumented-public-package
+    "D105",    # undocumented-magic-method
+    "D107",    # undocumented-public-init
+    "D203",    # one-blank-line-before-class
+    "D213",    # multi-line-summary-second-line
+    "ERA001",  # commented-out-code
+    "I001",    # unsorted-imports
 ]
 
 [tool.pytest.ini_options]
