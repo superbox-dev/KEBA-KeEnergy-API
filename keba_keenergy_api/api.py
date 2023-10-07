@@ -3,10 +3,10 @@ import json
 
 from aiohttp import ClientSession
 
-from keba_keyenergy_api.endpoints import BaseEndpoint
-from keba_keyenergy_api.endpoints import HeatCircuit
-from keba_keyenergy_api.endpoints import HeatPump
-from keba_keyenergy_api.endpoints import HotWaterTank
+from keba_keenergy_api.endpoints import BaseEndpoint
+from keba_keenergy_api.endpoints import HeatCircuit
+from keba_keenergy_api.endpoints import HeatPump
+from keba_keenergy_api.endpoints import HotWaterTank
 
 
 class KebaKeEnergyAPI(BaseEndpoint):

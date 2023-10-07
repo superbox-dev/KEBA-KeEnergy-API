@@ -5,9 +5,9 @@ from json import JSONDecodeError
 from aiohttp import ClientSession
 from aiohttp import ClientTimeout
 
-from keba_keyenergy_api.constants import API_DEFAULT_TIMEOUT
-from keba_keyenergy_api.error import APIError
-from keba_keyenergy_api.error import InvalidJsonError
+from keba_keenergy_api.constants import API_DEFAULT_TIMEOUT
+from keba_keenergy_api.error import APIError
+from keba_keenergy_api.error import InvalidJsonError
 
 
 class BaseEndpoint:

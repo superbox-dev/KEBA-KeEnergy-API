@@ -4,9 +4,9 @@ import pytest
 from aiohttp import ClientSession
 from aioresponses import aioresponses
 
-from keba_keyenergy_api.api import KebaKeEnergyAPI
-from keba_keyenergy_api.error import APIError
-from keba_keyenergy_api.error import InvalidJsonError
+from keba_keenergy_api.api import KebaKeEnergyAPI
+from keba_keenergy_api.error import APIError
+from keba_keenergy_api.error import InvalidJsonError
 
 
 class TestKebaKeEnergyAPI:

@@ -1,9 +1,9 @@
 import pytest
 from aioresponses.core import aioresponses
 
-from keba_keyenergy_api.api import KebaKeEnergyAPI
-from keba_keyenergy_api.constants import HeatCircuitOperatingMode
-from keba_keyenergy_api.constants import HotWaterTankOperatingMode
+from keba_keenergy_api.api import KebaKeEnergyAPI
+from keba_keenergy_api.constants import HeatCircuitOperatingMode
+from keba_keenergy_api.constants import HotWaterTankOperatingMode
 
 
 class TestHotWaterTank:

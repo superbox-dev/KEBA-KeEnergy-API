@@ -3,7 +3,7 @@ requires = ["setuptools >= 65", "setuptools-scm >= 7"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "keba_keyenergy_api"
+name = "keba_keenergy_api"
 description = "A thin Python wrapper for the KEBA KeEnergy API."
 readme = "README.md"
 authors = [
@@ -63,10 +63,10 @@ tests = [
 ]
 
 [tool.setuptools]
-packages = ["keba_keyenergy_api"]
+packages = ["keba_keenergy_api"]
 
 [tool.setuptools_scm]
-write_to = "keba_keyenergy_api/version.py"
+write_to = "keba_keenergy_api/version.py"
 
 [tool.black]
 line-length = 120

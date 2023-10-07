@@ -34,7 +34,7 @@ pytest -n auto
 To get the full test coverage report of `KEBA-KeEnergy-API`, run the following command:
 
 ```bash
-pytest --cov-report term-missing --cov=keba_keyenergy_api
+pytest --cov-report term-missing --cov=keba_keenergy_api
 ```
 
 ## Making a pull request

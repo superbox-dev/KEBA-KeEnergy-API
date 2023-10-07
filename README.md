@@ -22,8 +22,8 @@ pip install keba-keenergy-api
 ```python
 import asyncio
 
-from keba_keyenergy_api import KebaKeEnergyAPI
-from keba_keyenergy_api.constants import HeatCircuitOperatingMode
+from keba_keenergy_api import KebaKeEnergyAPI
+from keba_keenergy_api.constants import HeatCircuitOperatingMode
 
 
 async def main() -> None:
@@ -48,8 +48,8 @@ By default, the library creates a new connection to `KEBA KeEnergy API` with eac
 ```python
 import asyncio
 
-from keba_keyenergy_api import KebaKeEnergyAPI
-from keba_keyenergy_api.constants import HeatCircuitOperatingMode
+from keba_keenergy_api import KebaKeEnergyAPI
+from keba_keenergy_api.constants import HeatCircuitOperatingMode
 
 from aiohttp import ClientSession
 
