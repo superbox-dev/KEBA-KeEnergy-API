@@ -9,7 +9,7 @@ from keba_keyenergy_api.endpoints import HeatPump
 from keba_keyenergy_api.endpoints import HotWaterTank
 
 
-class KeEnergyAPI(BaseEndpoint):
+class KebaKeEnergyAPI(BaseEndpoint):
     """Client to interact with KEBA KeEnergy API."""
 
     def __init__(self, host: str, *, ssl: bool = False, session: ClientSession | None = None) -> None:

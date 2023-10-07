@@ -4,14 +4,14 @@ import pytest
 from aiohttp import ClientSession
 from aioresponses import aioresponses
 
-from keba_keyenergy_api.api import KeEnergyAPI
+from keba_keyenergy_api.api import KebaKeEnergyAPI
 from keba_keyenergy_api.error import APIError
 from keba_keyenergy_api.error import InvalidJsonError
 
 
 @pytest.mark.asyncio()
 async def test_api(mock_keenergy_api: aioresponses) -> None:
-    client: KeEnergyAPI = KeEnergyAPI(host="mocked-host")
+    client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
     data: float = await client.get_outdoor_temperature()
 
     assert isinstance(data, float)
@@ -22,7 +22,7 @@ async def test_api(mock_keenergy_api: aioresponses) -> None:
 @pytest.mark.asyncio()
 async def test_api_with_session(mock_keenergy_api: aioresponses) -> None:
     session: ClientSession = ClientSession()
-    client: KeEnergyAPI = KeEnergyAPI(host="mocked-host", session=session)
+    client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host", session=session)
     data: float = await client.get_outdoor_temperature()
 
     assert not session.closed
@@ -42,7 +42,7 @@ def test_invalid_json_error() -> None:
             body="bad-json",
             headers={"Content-Type": "application/json;charset=utf-8"},
         )
-        client: KeEnergyAPI = KeEnergyAPI(host="mocked-host")
+        client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
 
         with pytest.raises(InvalidJsonError) as error:
             loop.run_until_complete(client.get_outdoor_temperature())
@@ -59,7 +59,7 @@ def test_api_error() -> None:
             body='{"developerMessage": "mocked-error"}',
             headers={"Content-Type": "application/json;charset=utf-8"},
         )
-        client: KeEnergyAPI = KeEnergyAPI(host="mocked-host")
+        client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
 
         with pytest.raises(APIError) as error:
             loop.run_until_complete(client.get_outdoor_temperature())
