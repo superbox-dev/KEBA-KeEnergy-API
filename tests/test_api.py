@@ -15,7 +15,7 @@ class TestKebaKeEnergyAPI:
         with aioresponses() as mock_keenergy_api:
             mock_keenergy_api.post(
                 "http://mocked-host/var/readWriteVars",
-                body='[{"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue", "value": "10.808357"}]',
+                payload=[{"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue", "value": "10.808357"}],
                 headers={"Content-Type": "application/json;charset=utf-8"},
             )
 
@@ -36,7 +36,7 @@ class TestKebaKeEnergyAPI:
         with aioresponses() as mock_keenergy_api:
             mock_keenergy_api.post(
                 "http://mocked-host/var/readWriteVars",
-                body='[{"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue", "value": "10.808357"}]',
+                payload=[{"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue", "value": "10.808357"}],
                 headers={"Content-Type": "application/json;charset=utf-8"},
             )
 
@@ -78,7 +78,7 @@ class TestKebaKeEnergyAPI:
         with aioresponses() as mocked:
             mocked.post(
                 "http://mocked-host/var/readWriteVars",
-                body='{"developerMessage": "mocked-error"}',
+                payload={"developerMessage": "mocked-error"},
                 headers={"Content-Type": "application/json;charset=utf-8"},
             )
             client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
