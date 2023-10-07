@@ -9,59 +9,81 @@ from keba_keyenergy_api.error import APIError
 from keba_keyenergy_api.error import InvalidJsonError
 
 
-@pytest.mark.asyncio()
-async def test_api(mock_keenergy_api: aioresponses) -> None:
-    client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
-    data: float = await client.get_outdoor_temperature()
+class TestKebaKeEnergyAPI:
+    @pytest.mark.asyncio()
+    async def test_api(self) -> None:
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/var/readWriteVars",
+                body='[{"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue", "value": "10.808357"}]',
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
 
-    assert isinstance(data, float)
-    assert data == 10.808357  # noqa: PLR2004
-    mock_keenergy_api.assert_called_once()
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+            data: float = await client.get_outdoor_temperature()
 
+            assert isinstance(data, float)
+            assert data == 10.808357  # noqa: PLR2004
 
-@pytest.mark.asyncio()
-async def test_api_with_session(mock_keenergy_api: aioresponses) -> None:
-    session: ClientSession = ClientSession()
-    client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host", session=session)
-    data: float = await client.get_outdoor_temperature()
+            mock_keenergy_api.assert_called_once_with(
+                url="http://mocked-host/var/readWriteVars",
+                data='[{"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue"}]',
+                method="POST",
+            )
 
-    assert not session.closed
-    await session.close()
+    @pytest.mark.asyncio()
+    async def test_api_with_session(self) -> None:
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/var/readWriteVars",
+                body='[{"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue", "value": "10.808357"}]',
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
 
-    assert isinstance(data, float)
-    assert data == 10.808357  # noqa: PLR2004
-    mock_keenergy_api.assert_called_once()
+            session: ClientSession = ClientSession()
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host", session=session)
+            data: float = await client.get_outdoor_temperature()
 
+            assert not session.closed
+            await session.close()
 
-def test_invalid_json_error() -> None:
-    loop = asyncio.get_event_loop()
+            assert isinstance(data, float)
+            assert data == 10.808357  # noqa: PLR2004
 
-    with aioresponses() as mocked:
-        mocked.post(
-            "http://mocked-host/var/readWriteVars",
-            body="bad-json",
-            headers={"Content-Type": "application/json;charset=utf-8"},
-        )
-        client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+            mock_keenergy_api.assert_called_once_with(
+                url="http://mocked-host/var/readWriteVars",
+                data='[{"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue"}]',
+                method="POST",
+            )
 
-        with pytest.raises(InvalidJsonError) as error:
-            loop.run_until_complete(client.get_outdoor_temperature())
+    def test_invalid_json_error(self) -> None:
+        loop = asyncio.get_event_loop()
 
-        assert str(error.value) == "bad-json"
+        with aioresponses() as mocked:
+            mocked.post(
+                "http://mocked-host/var/readWriteVars",
+                body="bad-json",
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
 
+            with pytest.raises(InvalidJsonError) as error:
+                loop.run_until_complete(client.get_outdoor_temperature())
 
-def test_api_error() -> None:
-    loop = asyncio.get_event_loop()
+            assert str(error.value) == "bad-json"
 
-    with aioresponses() as mocked:
-        mocked.post(
-            "http://mocked-host/var/readWriteVars",
-            body='{"developerMessage": "mocked-error"}',
-            headers={"Content-Type": "application/json;charset=utf-8"},
-        )
-        client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+    def test_api_error(self) -> None:
+        loop = asyncio.get_event_loop()
 
-        with pytest.raises(APIError) as error:
-            loop.run_until_complete(client.get_outdoor_temperature())
+        with aioresponses() as mocked:
+            mocked.post(
+                "http://mocked-host/var/readWriteVars",
+                body='{"developerMessage": "mocked-error"}',
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
 
-        assert str(error.value) == "mocked-error"
+            with pytest.raises(APIError) as error:
+                loop.run_until_complete(client.get_outdoor_temperature())
+
+            assert str(error.value) == "mocked-error"
