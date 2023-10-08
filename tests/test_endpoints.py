@@ -47,6 +47,7 @@ class TestHotWaterTank:
                 url="http://mocked-host/var/readWriteVars",
                 data='[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.operatingMode"}]',
                 method="POST",
+                ssl=False,
             )
 
     @pytest.mark.asyncio()
@@ -74,6 +75,7 @@ class TestHotWaterTank:
                 data='[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.operatingMode", "value": "%s"}]'
                 % expected_value,
                 method="POST",
+                ssl=False,
             )
 
     @pytest.mark.asyncio()
@@ -95,6 +97,7 @@ class TestHotWaterTank:
                 url="http://mocked-host/var/readWriteVars",
                 data='[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.reducedSetTempMax.value"}]',
                 method="POST",
+                ssl=False,
             )
 
     @pytest.mark.asyncio()
@@ -113,6 +116,7 @@ class TestHotWaterTank:
                 url="http://mocked-host/var/readWriteVars?action=set",
                 data='[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.reducedSetTempMax.value", "value": "10"}]',
                 method="POST",
+                ssl=False,
             )
 
     @pytest.mark.asyncio()
@@ -134,6 +138,7 @@ class TestHotWaterTank:
                 url="http://mocked-host/var/readWriteVars",
                 data='[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.normalSetTempMax.value"}]',
                 method="POST",
+                ssl=False,
             )
 
     @pytest.mark.asyncio()
@@ -152,6 +157,7 @@ class TestHotWaterTank:
                 url="http://mocked-host/var/readWriteVars?action=set",
                 data='[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.normalSetTempMax.value", "value": "47"}]',
                 method="POST",
+                ssl=False,
             )
 
 
@@ -175,6 +181,7 @@ class TestHeatPump:
                 url="http://mocked-host/var/readWriteVars",
                 data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].values.heatpumpState"}]',
                 method="POST",
+                ssl=False,
             )
 
     @pytest.mark.asyncio()
@@ -196,6 +203,7 @@ class TestHeatPump:
                 url="http://mocked-host/var/readWriteVars",
                 data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].CircPump.values.setValueScaled"}]',
                 method="POST",
+                ssl=False,
             )
 
     @pytest.mark.asyncio()
@@ -222,6 +230,7 @@ class TestHeatPump:
                 url="http://mocked-host/var/readWriteVars",
                 data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatFlow.values.actValue"}]',
                 method="POST",
+                ssl=False,
             )
 
     @pytest.mark.asyncio()
@@ -248,6 +257,7 @@ class TestHeatPump:
                 url="http://mocked-host/var/readWriteVars",
                 data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatReflux.values.actValue"}]',
                 method="POST",
+                ssl=False,
             )
 
     @pytest.mark.asyncio()
@@ -274,6 +284,7 @@ class TestHeatPump:
                 url="http://mocked-host/var/readWriteVars",
                 data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempSourceIn.values.actValue"}]',
                 method="POST",
+                ssl=False,
             )
 
     @pytest.mark.asyncio()
@@ -295,6 +306,7 @@ class TestHeatPump:
                 url="http://mocked-host/var/readWriteVars",
                 data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempSourceOut.values.actValue"}]',
                 method="POST",
+                ssl=False,
             )
 
     @pytest.mark.asyncio()
@@ -321,6 +333,7 @@ class TestHeatPump:
                 url="http://mocked-host/var/readWriteVars",
                 data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempCompressorIn.values.actValue"}]',
                 method="POST",
+                ssl=False,
             )
 
     @pytest.mark.asyncio()
@@ -347,6 +360,7 @@ class TestHeatPump:
                 url="http://mocked-host/var/readWriteVars",
                 data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempCompressorOut.values.actValue"}]',
                 method="POST",
+                ssl=False,
             )
 
     @pytest.mark.asyncio()
@@ -368,6 +382,7 @@ class TestHeatPump:
                 url="http://mocked-host/var/readWriteVars",
                 data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].Compressor.values.setValueScaled"}]',
                 method="POST",
+                ssl=False,
             )
 
     @pytest.mark.asyncio()
@@ -394,6 +409,7 @@ class TestHeatPump:
                 url="http://mocked-host/var/readWriteVars",
                 data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].HighPressure.values.actValue"}]',
                 method="POST",
+                ssl=False,
             )
 
     @pytest.mark.asyncio()
@@ -415,6 +431,7 @@ class TestHeatPump:
                 url="http://mocked-host/var/readWriteVars",
                 data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].LowPressure.values.actValue"}]',
                 method="POST",
+                ssl=False,
             )
 
 
@@ -438,6 +455,7 @@ class TestHeatCircuit:
                 url="http://mocked-host/var/readWriteVars",
                 data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue"}]',
                 method="POST",
+                ssl=False,
             )
 
     @pytest.mark.asyncio()
@@ -459,6 +477,7 @@ class TestHeatCircuit:
                 url="http://mocked-host/var/readWriteVars",
                 data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.normalSetTemp"}]',
                 method="POST",
+                ssl=False,
             )
 
     @pytest.mark.asyncio()
@@ -477,6 +496,7 @@ class TestHeatCircuit:
                 url="http://mocked-host/var/readWriteVars?action=set",
                 data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.normalSetTemp", "value": "23"}]',
                 method="POST",
+                ssl=False,
             )
 
     @pytest.mark.asyncio()
@@ -498,6 +518,7 @@ class TestHeatCircuit:
                 url="http://mocked-host/var/readWriteVars",
                 data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.thresholdDayTemp.value"}]',
                 method="POST",
+                ssl=False,
             )
 
     @pytest.mark.asyncio()
@@ -519,6 +540,7 @@ class TestHeatCircuit:
                 url="http://mocked-host/var/readWriteVars",
                 data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.reducedSetTemp"}]',
                 method="POST",
+                ssl=False,
             )
 
     @pytest.mark.asyncio()
@@ -537,6 +559,7 @@ class TestHeatCircuit:
                 url="http://mocked-host/var/readWriteVars?action=set",
                 data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.reducedSetTemp", "value": "23"}]',
                 method="POST",
+                ssl=False,
             )
 
     @pytest.mark.asyncio()
@@ -558,6 +581,7 @@ class TestHeatCircuit:
                 url="http://mocked-host/var/readWriteVars",
                 data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.thresholdNightTemp.value"}]',
                 method="POST",
+                ssl=False,
             )
 
     @pytest.mark.asyncio()
@@ -579,6 +603,7 @@ class TestHeatCircuit:
                 url="http://mocked-host/var/readWriteVars",
                 data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.holidaySetTemp"}]',
                 method="POST",
+                ssl=False,
             )
 
     @pytest.mark.asyncio()
@@ -600,6 +625,7 @@ class TestHeatCircuit:
                 url="http://mocked-host/var/readWriteVars",
                 data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.offsetRoomTemp"}]',
                 method="POST",
+                ssl=False,
             )
 
     @pytest.mark.asyncio()
@@ -618,6 +644,7 @@ class TestHeatCircuit:
                 url="http://mocked-host/var/readWriteVars?action=set",
                 data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.offsetRoomTemp", "value": "2"}]',
                 method="POST",
+                ssl=False,
             )
 
     @pytest.mark.asyncio()
@@ -639,6 +666,7 @@ class TestHeatCircuit:
                 url="http://mocked-host/var/readWriteVars",
                 data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.operatingMode"}]',
                 method="POST",
+                ssl=False,
             )
 
     @pytest.mark.asyncio()
@@ -671,4 +699,5 @@ class TestHeatCircuit:
                 data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.operatingMode", "value": "%s"}]'
                 % expected_value,
                 method="POST",
+                ssl=False,
             )

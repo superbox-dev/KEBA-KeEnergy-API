@@ -29,6 +29,7 @@ class TestKebaKeEnergyAPI:
                 url="http://mocked-host/var/readWriteVars",
                 data='[{"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue"}]',
                 method="POST",
+                ssl=False,
             )
 
     @pytest.mark.asyncio()
@@ -54,6 +55,7 @@ class TestKebaKeEnergyAPI:
                 url="http://mocked-host/var/readWriteVars",
                 data='[{"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue"}]',
                 method="POST",
+                ssl=False,
             )
 
     def test_invalid_json_error(self) -> None:
