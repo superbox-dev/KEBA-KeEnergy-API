@@ -17,11 +17,11 @@ class KebaKeEnergyAPI(BaseEndpoint):
         schema: str = "https" if ssl else "http"
         base_url: str = f"{schema}://{host}/var/readWriteVars"
 
-        self.hot_water_tank: HotWaterTank = HotWaterTank(base_url=base_url, session=session)
-        self.heat_pump: HeatPump = HeatPump(base_url=base_url, session=session)
-        self.heat_circuit: HeatCircuit = HeatCircuit(base_url=base_url, session=session)
+        self.hot_water_tank: HotWaterTank = HotWaterTank(base_url=base_url, ssl=ssl, session=session)
+        self.heat_pump: HeatPump = HeatPump(base_url=base_url, ssl=ssl, session=session)
+        self.heat_circuit: HeatCircuit = HeatCircuit(base_url=base_url, ssl=ssl, session=session)
 
-        super().__init__(payload_type="APPL.CtrlAppl.sParam", base_url=base_url, session=session)
+        super().__init__(payload_type="APPL.CtrlAppl.sParam", base_url=base_url, ssl=ssl, session=session)
 
     async def get_outdoor_temperature(self) -> float:
         """Get outdoor temperature."""
