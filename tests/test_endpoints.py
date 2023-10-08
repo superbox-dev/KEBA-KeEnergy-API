@@ -119,7 +119,7 @@ class TestDevice:
             data: int = await client.device.get_variant_number()
 
             assert isinstance(data, int)
-            assert data == 0  # noqa: PLR2004
+            assert data == 0
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/deviceControl?action=getDeviceInfo",

@@ -1,5 +1,6 @@
 """Client to interact with KEBA KeEnergy API."""
 import json
+from typing import Any
 
 from aiohttp import ClientSession
 
@@ -31,5 +32,5 @@ class KebaKeEnergyAPI(BaseEndpoint):
             "name": f"{self._payload_type}.outdoorTemp.values.actValue",
         }
 
-        data: list[dict[str, str]] = await self._post(payload=json.dumps([payload]))
+        data: list[dict[str, Any]] = await self._post(payload=json.dumps([payload]))
         return float(data[0]["value"])

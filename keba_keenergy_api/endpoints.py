@@ -1,6 +1,7 @@
 """Retrieve hot water tank data."""
 import json
 from json import JSONDecodeError
+from typing import Any
 
 from aiohttp import ClientSession
 from aiohttp import ClientTimeout
@@ -24,7 +25,7 @@ class BaseEndpoint:
         self._payload_type: str | None = payload_type
         self._session: ClientSession | None = session
 
-    async def _post(self, payload: str | None = None, endpoint: str | None = None) -> list[dict[str, str]]:
+    async def _post(self, payload: str | None = None, endpoint: str | None = None) -> list[dict[str, Any]]:
         """Run a POST request against the API."""
         session: ClientSession = (
             self._session
@@ -38,7 +39,7 @@ class BaseEndpoint:
                 ssl=self._ssl,
                 data=payload,
             ) as resp:
-                data: list[dict[str, str]] = await resp.json(
+                data: list[dict[str, Any]] = await resp.json(
                     content_type="application/json;charset=utf-8",
                 )
         except JSONDecodeError as error:
@@ -75,22 +76,22 @@ class Device(BaseEndpoint):
 
     async def get_name(self) -> str:
         """Get name."""
-        data: list[dict[str, str]] = await self._post(endpoint="?action=getDeviceInfo")
-        return data[0]["name"]
+        data: list[dict[str, Any]] = await self._post(endpoint="?action=getDeviceInfo")
+        return str(data[0]["name"])
 
     async def get_serial_number(self) -> int:
         """Get serial_number."""
-        data: list[dict[str, str]] = await self._post(endpoint="?action=getDeviceInfo")
+        data: list[dict[str, Any]] = await self._post(endpoint="?action=getDeviceInfo")
         return int(data[0]["serNo"])
 
     async def get_revision_number(self) -> int:
         """Get revision name."""
-        data: list[dict[str, str]] = await self._post(endpoint="?action=getDeviceInfo")
+        data: list[dict[str, Any]] = await self._post(endpoint="?action=getDeviceInfo")
         return int(data[0]["revNo"])
 
     async def get_variant_number(self) -> int:
         """Get variant name."""
-        data: list[dict[str, str]] = await self._post(endpoint="?action=getDeviceInfo")
+        data: list[dict[str, Any]] = await self._post(endpoint="?action=getDeviceInfo")
         return int(data[0]["variantNo"])
 
 
@@ -102,12 +103,12 @@ class HotWaterTank(BaseEndpoint):
 
     async def get_temperature(self, position: int | None = None) -> float:
         """Get current temperature."""
-        data: list[dict[str, str]] = await self._post(payload=self._get_payload(position, "topTemp.values.actValue"))
+        data: list[dict[str, Any]] = await self._post(payload=self._get_payload(position, "topTemp.values.actValue"))
         return float(data[0]["value"])
 
     async def get_operating_mode(self, position: int | None = None) -> int:
         """Get operating mode."""
-        data: list[dict[str, str]] = await self._post(payload=self._get_payload(position, "param.operatingMode"))
+        data: list[dict[str, Any]] = await self._post(payload=self._get_payload(position, "param.operatingMode"))
         return int(data[0]["value"])
 
     async def set_operating_mode(self, mode: int, position: int | None = None) -> None:
@@ -116,7 +117,7 @@ class HotWaterTank(BaseEndpoint):
 
     async def get_min_temperature(self, position: int | None = None) -> float:
         """Get minimum temperature."""
-        data: list[dict[str, str]] = await self._post(
+        data: list[dict[str, Any]] = await self._post(
             payload=self._get_payload(position, "param.reducedSetTempMax.value"),
         )
         return float(data[0]["value"])
@@ -130,7 +131,7 @@ class HotWaterTank(BaseEndpoint):
 
     async def get_max_temperature(self, position: int | None = None) -> float:
         """Get maximum temperature."""
-        data: list[dict[str, str]] = await self._post(
+        data: list[dict[str, Any]] = await self._post(
             payload=self._get_payload(position, "param.normalSetTempMax.value"),
         )
         return float(data[0]["value"])
@@ -151,75 +152,75 @@ class HeatPump(BaseEndpoint):
 
     async def get_status(self, position: int | None = None) -> int:
         """Get status."""
-        data: list[dict[str, str]] = await self._post(payload=self._get_payload(position, "values.heatpumpState"))
+        data: list[dict[str, Any]] = await self._post(payload=self._get_payload(position, "values.heatpumpState"))
         return int(data[0]["value"])
 
     async def get_circulation_pump(self, position: int | None = None) -> float:
         """Get circulation pump."""
-        data: list[dict[str, str]] = await self._post(
+        data: list[dict[str, Any]] = await self._post(
             payload=self._get_payload(position, "CircPump.values.setValueScaled"),
         )
         return float(data[0]["value"]) * 100
 
     async def get_inflow_temperature(self, position: int | None = None) -> float:
         """Get inflow temperature."""
-        data: list[dict[str, str]] = await self._post(
+        data: list[dict[str, Any]] = await self._post(
             payload=self._get_payload(position, "TempHeatFlow.values.actValue"),
         )
         return float(data[0]["value"])
 
     async def get_reflux_temperature(self, position: int | None = None) -> float:
         """Get reflux temperature."""
-        data: list[dict[str, str]] = await self._post(
+        data: list[dict[str, Any]] = await self._post(
             payload=self._get_payload(position, "TempHeatReflux.values.actValue"),
         )
         return float(data[0]["value"])
 
     async def get_source_input_temperature(self, position: int | None = None) -> float:
         """Get source input temperature."""
-        data: list[dict[str, str]] = await self._post(
+        data: list[dict[str, Any]] = await self._post(
             payload=self._get_payload(position, "TempSourceIn.values.actValue"),
         )
         return float(data[0]["value"])
 
     async def get_source_output_temperature(self, position: int | None = None) -> float:
         """Get source output temperature."""
-        data: list[dict[str, str]] = await self._post(
+        data: list[dict[str, Any]] = await self._post(
             payload=self._get_payload(position, "TempSourceOut.values.actValue"),
         )
         return float(data[0]["value"])
 
     async def get_compressor_input_temperature(self, position: int | None = None) -> float:
         """Get compressor input temperature."""
-        data: list[dict[str, str]] = await self._post(
+        data: list[dict[str, Any]] = await self._post(
             payload=self._get_payload(position, "TempCompressorIn.values.actValue"),
         )
         return float(data[0]["value"])
 
     async def get_compressor_output_temperature(self, position: int | None = None) -> float:
         """Get compressor output temperature."""
-        data: list[dict[str, str]] = await self._post(
+        data: list[dict[str, Any]] = await self._post(
             payload=self._get_payload(position, "TempCompressorOut.values.actValue"),
         )
         return float(data[0]["value"])
 
     async def get_compressor(self, position: int | None = None) -> float:
         """Get compressor."""
-        data: list[dict[str, str]] = await self._post(
+        data: list[dict[str, Any]] = await self._post(
             payload=self._get_payload(position, "Compressor.values.setValueScaled"),
         )
         return float(data[0]["value"]) * 100
 
     async def get_high_pressure(self, position: int | None = None) -> float:
         """Get high pressure in bar."""
-        data: list[dict[str, str]] = await self._post(
+        data: list[dict[str, Any]] = await self._post(
             payload=self._get_payload(position, "HighPressure.values.actValue"),
         )
         return float(data[0]["value"])
 
     async def get_low_pressure(self, position: int | None = None) -> float:
         """Get low pressure in bar."""
-        data: list[dict[str, str]] = await self._post(
+        data: list[dict[str, Any]] = await self._post(
             payload=self._get_payload(position, "LowPressure.values.actValue"),
         )
         return float(data[0]["value"])
@@ -233,12 +234,12 @@ class HeatCircuit(BaseEndpoint):
 
     async def get_temperature(self, position: int | None = None) -> float:
         """Get temperature."""
-        data: list[dict[str, str]] = await self._post(payload=self._get_payload(position, "values.setValue"))
+        data: list[dict[str, Any]] = await self._post(payload=self._get_payload(position, "values.setValue"))
         return float(data[0]["value"])
 
     async def get_day_temperature(self, position: int | None = None) -> float:
         """Get day temperature."""
-        data: list[dict[str, str]] = await self._post(payload=self._get_payload(position, "param.normalSetTemp"))
+        data: list[dict[str, Any]] = await self._post(payload=self._get_payload(position, "param.normalSetTemp"))
         return float(data[0]["value"])
 
     async def set_day_temperature(self, temperature: int, position: int | None = None) -> None:
@@ -250,14 +251,14 @@ class HeatCircuit(BaseEndpoint):
 
     async def get_day_temperature_threshold(self, position: int | None = None) -> float:
         """Get day temperature threshold."""
-        data: list[dict[str, str]] = await self._post(
+        data: list[dict[str, Any]] = await self._post(
             payload=self._get_payload(position, "param.thresholdDayTemp.value"),
         )
         return float(data[0]["value"])
 
     async def get_night_temperature(self, position: int | None = None) -> float | None:
         """Get night temperature."""
-        data: list[dict[str, str]] = await self._post(
+        data: list[dict[str, Any]] = await self._post(
             payload=self._get_payload(position, "param.reducedSetTemp"),
         )
         return float(data[0]["value"])
@@ -271,21 +272,21 @@ class HeatCircuit(BaseEndpoint):
 
     async def get_night_temperature_threshold(self, position: int | None = None) -> float:
         """Get night temperature threshold."""
-        data: list[dict[str, str]] = await self._post(
+        data: list[dict[str, Any]] = await self._post(
             payload=self._get_payload(position, "param.thresholdNightTemp.value"),
         )
         return float(data[0]["value"])
 
     async def get_holiday_temperature(self, position: int | None = None) -> float:
         """Get holiday temperature."""
-        data: list[dict[str, str]] = await self._post(
+        data: list[dict[str, Any]] = await self._post(
             payload=self._get_payload(position, "param.holidaySetTemp"),
         )
         return float(data[0]["value"])
 
     async def get_offset_temperature(self, position: int | None = None) -> float:
         """Get offset temperature."""
-        data: list[dict[str, str]] = await self._post(
+        data: list[dict[str, Any]] = await self._post(
             payload=self._get_payload(position, "param.offsetRoomTemp"),
         )
         return float(data[0]["value"])
@@ -299,7 +300,7 @@ class HeatCircuit(BaseEndpoint):
 
     async def get_operating_mode(self, position: int | None = None) -> int:
         """Get operating mode."""
-        data: list[dict[str, str]] = await self._post(
+        data: list[dict[str, Any]] = await self._post(
             payload=self._get_payload(position, "param.operatingMode"),
         )
         return int(data[0]["value"])
