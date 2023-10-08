@@ -64,11 +64,18 @@ asyncio.run(main())
 
 ### API endpoints
 
-
 | Endpoint                     | Type    | Description              |
 |------------------------------|---------|--------------------------|
 | `.get_outdoor_temperature()` | `float` | Get outdoor temperature. |
 
+#### Device
+
+| Endpoint                 | Type  | Description        |
+|--------------------------|-------|--------------------|
+| `.get_name()`            | `str` | Get name.          |
+| `.get_serial_number()`   | `int` | Get serial number. |
+| `.get_revision_number()` | `int` | Get revision name. |
+| `.get_variant_number()`  | `int` | Get variant name.  |
 
 #### Hot water tank
 

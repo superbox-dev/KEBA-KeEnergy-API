@@ -4,6 +4,7 @@ import json
 from aiohttp import ClientSession
 
 from keba_keenergy_api.endpoints import BaseEndpoint
+from keba_keenergy_api.endpoints import Device
 from keba_keenergy_api.endpoints import HeatCircuit
 from keba_keenergy_api.endpoints import HeatPump
 from keba_keenergy_api.endpoints import HotWaterTank
@@ -17,6 +18,7 @@ class KebaKeEnergyAPI(BaseEndpoint):
         schema: str = "https" if ssl else "http"
         base_url: str = f"{schema}://{host}/var/readWriteVars"
 
+        self.device: Device = Device(base_url=f"{schema}://{host}/deviceControl", ssl=ssl, session=session)
         self.hot_water_tank: HotWaterTank = HotWaterTank(base_url=base_url, ssl=ssl, session=session)
         self.heat_pump: HeatPump = HeatPump(base_url=base_url, ssl=ssl, session=session)
         self.heat_circuit: HeatCircuit = HeatCircuit(base_url=base_url, ssl=ssl, session=session)

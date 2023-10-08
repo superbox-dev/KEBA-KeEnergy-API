@@ -11,13 +11,20 @@ from keba_keenergy_api.error import InvalidJsonError
 
 
 class BaseEndpoint:
-    def __init__(self, payload_type: str, base_url: str, ssl: bool, session: ClientSession | None = None) -> None:
-        self._payload_type: str = payload_type
+    def __init__(
+        self,
+        base_url: str,
+        *,
+        ssl: bool,
+        payload_type: str | None = None,
+        session: ClientSession | None = None,
+    ) -> None:
         self._base_url: str = base_url
         self._ssl: bool = ssl
+        self._payload_type: str | None = payload_type
         self._session: ClientSession | None = session
 
-    async def _post(self, payload: str, endpoint: str | None = None) -> list[dict[str, str]]:
+    async def _post(self, payload: str | None = None, endpoint: str | None = None) -> list[dict[str, str]]:
         """Run a POST request against the API."""
         session: ClientSession = (
             self._session
@@ -27,7 +34,9 @@ class BaseEndpoint:
 
         try:
             async with session.post(
-                f"{self._base_url}{endpoint if endpoint else ''}", ssl=self._ssl, data=payload
+                f"{self._base_url}{endpoint if endpoint else ''}",
+                ssl=self._ssl,
+                data=payload,
             ) as resp:
                 data: list[dict[str, str]] = await resp.json(
                     content_type="application/json;charset=utf-8",
@@ -58,11 +67,38 @@ class BaseEndpoint:
         return json.dumps([payload])
 
 
+class Device(BaseEndpoint):
+    """Class to retrieve the device data."""
+
+    def __init__(self, base_url: str, *, ssl: bool, session: ClientSession | None = None) -> None:
+        super().__init__(base_url=base_url, ssl=ssl, session=session)
+
+    async def get_name(self) -> str:
+        """Get name."""
+        data: list[dict[str, str]] = await self._post(endpoint="?action=getDeviceInfo")
+        return data[0]["name"]
+
+    async def get_serial_number(self) -> int:
+        """Get serial_number."""
+        data: list[dict[str, str]] = await self._post(endpoint="?action=getDeviceInfo")
+        return int(data[0]["serNo"])
+
+    async def get_revision_number(self) -> int:
+        """Get revision name."""
+        data: list[dict[str, str]] = await self._post(endpoint="?action=getDeviceInfo")
+        return int(data[0]["revNo"])
+
+    async def get_variant_number(self) -> int:
+        """Get variant name."""
+        data: list[dict[str, str]] = await self._post(endpoint="?action=getDeviceInfo")
+        return int(data[0]["variantNo"])
+
+
 class HotWaterTank(BaseEndpoint):
     """Class to send and retrieve the hot water tank data."""
 
-    def __init__(self, base_url: str, ssl: bool, session: ClientSession | None = None) -> None:
-        super().__init__(payload_type="APPL.CtrlAppl.sParam.hotWaterTank", base_url=base_url, ssl=ssl, session=session)
+    def __init__(self, base_url: str, *, ssl: bool, session: ClientSession | None = None) -> None:
+        super().__init__(base_url=base_url, ssl=ssl, payload_type="APPL.CtrlAppl.sParam.hotWaterTank", session=session)
 
     async def get_temperature(self, position: int | None = None) -> float:
         """Get current temperature."""
@@ -108,10 +144,10 @@ class HotWaterTank(BaseEndpoint):
 
 
 class HeatPump(BaseEndpoint):
-    """Class to send and retrieve the heat pump data."""
+    """Class to retrieve the heat pump data."""
 
-    def __init__(self, base_url: str, ssl: bool, session: ClientSession | None = None) -> None:
-        super().__init__(payload_type="APPL.CtrlAppl.sParam.heatpump", base_url=base_url, ssl=ssl, session=session)
+    def __init__(self, base_url: str, *, ssl: bool, session: ClientSession | None = None) -> None:
+        super().__init__(base_url=base_url, ssl=ssl, payload_type="APPL.CtrlAppl.sParam.heatpump", session=session)
 
     async def get_status(self, position: int | None = None) -> int:
         """Get status."""
@@ -192,8 +228,8 @@ class HeatPump(BaseEndpoint):
 class HeatCircuit(BaseEndpoint):
     """Class to send and retrieve the heat pump data."""
 
-    def __init__(self, base_url: str, ssl: bool, session: ClientSession | None = None) -> None:
-        super().__init__(payload_type="APPL.CtrlAppl.sParam.heatCircuit", base_url=base_url, ssl=ssl, session=session)
+    def __init__(self, base_url: str, *, ssl: bool, session: ClientSession | None = None) -> None:
+        super().__init__(base_url=base_url, ssl=ssl, payload_type="APPL.CtrlAppl.sParam.heatCircuit", session=session)
 
     async def get_temperature(self, position: int | None = None) -> float:
         """Get temperature."""
