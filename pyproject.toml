@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "keba_keenergy_api"
-description = "A thin Python wrapper for the KEBA KeEnergy API."
+description = "A Python wrapper for the KEBA KeEnergy API."
 readme = "README.md"
 authors = [
     { name = "Michael Hacker", email = "mh@superbox.one" },

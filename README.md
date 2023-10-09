@@ -9,7 +9,7 @@
 
 # KEBA KeEnergy API
 
-A thin Python wrapper for the KEBA KeEnergy API.
+A Python wrapper for the KEBA KeEnergy API.
 
 ## Getting started
 
