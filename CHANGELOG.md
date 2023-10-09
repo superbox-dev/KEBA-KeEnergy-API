@@ -7,18 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2023-10-09
+
 ### Added
 
 - Added `read_values()` to read multiple values with one http request.
 - Added `write_values()` to write multiple values with one http request.
 
-## [1.1.0] - 2023-10-09
+## [1.1.0] - 2023-10-08
 
 ### Added
 
 - Added device information endpoint for e.g. serial number
 - Added ssl support for aiohttp.
 
-## [1.0.0] - 2023-10-08
+## [1.0.0] - 2023-10-07
 
 Initial release
