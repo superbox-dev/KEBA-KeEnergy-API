@@ -26,10 +26,10 @@ class TestDevice:
             )
 
             client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
-            data: str = await client.device.get_name()
+            response: str = await client.device.get_name()
 
-            assert isinstance(data, str)
-            assert data == "MOCKED-NAME"
+            assert isinstance(response, str)
+            assert response == "MOCKED-NAME"
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/deviceControl?action=getDeviceInfo",
@@ -56,10 +56,10 @@ class TestDevice:
             )
 
             client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
-            data: int = await client.device.get_serial_number()
+            response: int = await client.device.get_serial_number()
 
-            assert isinstance(data, int)
-            assert data == 12345678  # noqa: PLR2004
+            assert isinstance(response, int)
+            assert response == 12345678  # noqa: PLR2004
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/deviceControl?action=getDeviceInfo",
@@ -147,7 +147,7 @@ class TestHotWaterTank:
             data: float = await client.hot_water_tank.get_temperature()
 
             assert isinstance(data, float)
-            assert data == 58.900002  # noqa: PLR2004
+            assert data == 58.9  # noqa: PLR2004
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
@@ -325,7 +325,7 @@ class TestHeatPump:
             data: float = await client.heat_pump.get_circulation_pump()
 
             assert isinstance(data, float)
-            assert data == 50.0  # noqa: PLR2004
+            assert data == 0.5  # noqa: PLR2004
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
@@ -352,7 +352,7 @@ class TestHeatPump:
             data: float = await client.heat_pump.get_inflow_temperature()
 
             assert isinstance(data, float)
-            assert data == 24.200001  # noqa: PLR2004
+            assert data == 24.2  # noqa: PLR2004
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
@@ -379,7 +379,7 @@ class TestHeatPump:
             data: float = await client.heat_pump.get_reflux_temperature()
 
             assert isinstance(data, float)
-            assert data == 23.200001  # noqa: PLR2004
+            assert data == 23.2  # noqa: PLR2004
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
@@ -406,7 +406,7 @@ class TestHeatPump:
             data: float = await client.heat_pump.get_source_input_temperature()
 
             assert isinstance(data, float)
-            assert data == 22.700001  # noqa: PLR2004
+            assert data == 22.7  # noqa: PLR2004
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
@@ -504,7 +504,7 @@ class TestHeatPump:
             data: float = await client.heat_pump.get_compressor()
 
             assert isinstance(data, float)
-            assert data == 30.0  # noqa: PLR2004
+            assert data == 0.3  # noqa: PLR2004
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
@@ -531,7 +531,7 @@ class TestHeatPump:
             data: float = await client.heat_pump.get_high_pressure()
 
             assert isinstance(data, float)
-            assert data == 15.018749  # noqa: PLR2004
+            assert data == 15.02  # noqa: PLR2004
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
@@ -553,7 +553,7 @@ class TestHeatPump:
             data: float = await client.heat_pump.get_low_pressure()
 
             assert isinstance(data, float)
-            assert data == 14.8125  # noqa: PLR2004
+            assert data == 14.81  # noqa: PLR2004
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",

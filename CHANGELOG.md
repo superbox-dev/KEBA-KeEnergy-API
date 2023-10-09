@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added `read_values()` to read multiple values with one http request.
+- Added `write_values()` to write multiple values with one http request.
+
 ## [1.1.0] - 2023-10-09
 
 ### Added

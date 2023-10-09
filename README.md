@@ -21,9 +21,11 @@ pip install keba-keenergy-api
 
 ```python
 import asyncio
+from typing import Any
 
 from keba_keenergy_api import KebaKeEnergyAPI
 from keba_keenergy_api.constants import HeatCircuitOperatingMode
+from keba_keenergy_api.constants import HeatCircuit
 
 
 async def main() -> None:
@@ -35,8 +37,26 @@ async def main() -> None:
     # Get heat circuit temperature from heat circuit 2
     heat_circuit_temperature: float = await client.heat_circuit.get_temperature(position=2)
 
+    # Read multiple values
+    data: dict[str, dict[str, Any]] = await client.read_values(
+        request=[
+            HeatCircuit.TEMPERATURE, 
+            HeatCircuit.DAY_TEMPERATURE,
+        ],
+        position=1,
+    )
+    
     # Enable "day" mode for heat circuit
     await client.heat_circuit.set_operating_mode(mode=HeatCircuitOperatingMode.DAY)
+
+    # Write multiple values
+    await client.write_values(
+        request={
+            HeatCircuit.DAY_TEMPERATURE: 20, 
+            HeatCircuit.NIGHT_TEMPERATURE: 16,
+        },
+        position=1,
+    )
 
 
 asyncio.run(main())
@@ -64,34 +84,36 @@ asyncio.run(main())
 
 ### API endpoints
 
-| Endpoint                     | Type    | Description              |
-|------------------------------|---------|--------------------------|
-| `.get_outdoor_temperature()` | `float` | Get outdoor temperature. |
+| Endpoint                           | Response | Description                                  |
+|------------------------------------|----------|----------------------------------------------|
+| `.get_outdoor_temperature()`       | `float`  | Get outdoor temperature.                     |
+| `.read_values(request, position)`  |          | Get multiple values with one http request.   |
+| `.write_values(request, position)` |          | Write multiple values with one http request. |
 
 #### Device
 
-| Endpoint                 | Type  | Description        |
-|--------------------------|-------|--------------------|
-| `.get_name()`            | `str` | Get name.          |
-| `.get_serial_number()`   | `int` | Get serial number. |
-| `.get_revision_number()` | `int` | Get revision name. |
-| `.get_variant_number()`  | `int` | Get variant name.  |
+| Endpoint                 | Response | Description        |
+|--------------------------|----------|--------------------|
+| `.get_name()`            | `str`    | Get name.          |
+| `.get_serial_number()`   | `int`    | Get serial number. |
+| `.get_revision_number()` | `int`    | Get revision name. |
+| `.get_variant_number()`  | `int`    | Get variant name.  |
 
 #### Hot water tank
 
-| Endpoint                   | Type    | Description                                                                          |
-|----------------------------|---------|--------------------------------------------------------------------------------------|
-| `.get_temperature()`       | `float` | Get temperature.                                                                     |
-| `.get_operating_mode()`    | `int`   | Get operating mode as integer (0 is `OFF`, 1 is `AUTO`, 2 is `DAY` and 3 is `NIGHT`. |
-| `.set_operating_mode(0)`   | `int`   | Set operating mode.                                                                  |
-| `.get_min_temperature()`   | `float` | Get minimum temperature.                                                             |
-| `.set_min_temperature(20)` | `float` | Set minimum temperature.                                                             |
-| `.get_max_temperature()`   | `float` | Get maximum temperature.                                                             |
-| `.set_max_temperature(22)` | `float` | Set maximum temperature.                                                             |
+| Endpoint                   | Request/Response | Description                                                                          |
+|----------------------------|------------------|--------------------------------------------------------------------------------------|
+| `.get_temperature()`       | `float`          | Get temperature.                                                                     |
+| `.get_operating_mode()`    | `int`            | Get operating mode as integer (0 is `OFF`, 1 is `AUTO`, 2 is `DAY` and 3 is `NIGHT`. |
+| `.set_operating_mode(0)`   | `int`            | Set operating mode.                                                                  |
+| `.get_min_temperature()`   | `float`          | Get minimum temperature.                                                             |
+| `.set_min_temperature(20)` | `float`          | Set minimum temperature.                                                             |
+| `.get_max_temperature()`   | `float`          | Get maximum temperature.                                                             |
+| `.set_max_temperature(22)` | `float`          | Set maximum temperature.                                                             |
 
 ### Heat pump
 
-| Endpoint                               | Type     | Description                                                                 |
+| Endpoint                               | Response | Description                                                                 |
 |----------------------------------------|----------|-----------------------------------------------------------------------------|
 | `.get_status()`                        | `int`    | Get operating mode as integer (0 is `STANDBY`, 1 is `FLOW` and 2 is `AUTO`. |
 | `.get_circulation_pump()`              | `float`  | Get circulation pump in percent.                                            |
@@ -107,20 +129,20 @@ asyncio.run(main())
 
 ### Heat circuit
 
-| Endpoint                             | Type    | Description                                         |
-|--------------------------------------|---------|-----------------------------------------------------|
-| `.get_temperature()`                 | `float` | Get temperature.                                    |
-| `.get_day_temperature()`             | `float` | Get day temperature.                                |
-| `.set_day_temperature(20)`           | `float` | Set day temperature.                                |
-| `.get_day_temperature_threshold()`   | `float` | Get day temperature threshold.                      |
-| `.get_night_temperature()`           | `float` | Get night temperature.                              |
-| `.set_night_temperature(16)`         | `float` | Set night temperature.                              |
-| `.get_night_temperature_threshold()` | `float` | Get night temperature threshold.                    |
-| `.get_holiday_temperature()`         | `float` | Get holiday temperature.                            |
-| `.get_offset_temperature()`          | `float` | Get offset temperature.                             |
-| `.set_offset_temperature(2)`         | `float` | Set offset temperature.                             |
-| `.get_operating_mode()`              | `int`   | Get operating mode (0 is `OFF` and 3 is `HEAT_UP`). |
-| `.set_operating_mode(3)`             | `int`   | Set operating mode.                                 |
+| Endpoint                             | Request/Response | Description                                         |
+|--------------------------------------|------------------|-----------------------------------------------------|
+| `.get_temperature()`                 | `float`          | Get temperature.                                    |
+| `.get_day_temperature()`             | `float`          | Get day temperature.                                |
+| `.set_day_temperature(20)`           | `float`          | Set day temperature.                                |
+| `.get_day_temperature_threshold()`   | `float`          | Get day temperature threshold.                      |
+| `.get_night_temperature()`           | `float`          | Get night temperature.                              |
+| `.set_night_temperature(16)`         | `float`          | Set night temperature.                              |
+| `.get_night_temperature_threshold()` | `float`          | Get night temperature threshold.                    |
+| `.get_holiday_temperature()`         | `float`          | Get holiday temperature.                            |
+| `.get_offset_temperature()`          | `float`          | Get offset temperature.                             |
+| `.set_offset_temperature(2)`         | `float`          | Set offset temperature.                             |
+| `.get_operating_mode()`              | `int`            | Get operating mode (0 is `OFF` and 3 is `HEAT_UP`). |
+| `.set_operating_mode(3)`             | `int`            | Set operating mode.                                 |
 
 ## Changelog
 
