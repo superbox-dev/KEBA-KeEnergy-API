@@ -94,6 +94,7 @@ ignore = [
     "D213",    # multi-line-summary-second-line
     "ERA001",  # commented-out-code
     "I001",    # unsorted-imports
+    "PLR0913", # too-many-arguments
     "S101",    # assert-used
 ]
 

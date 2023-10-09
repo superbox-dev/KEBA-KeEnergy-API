@@ -31,7 +31,7 @@ class KebaKeEnergyAPI(BaseSection):
         self,
         request: Control | list[Control],
         position: int | None | list[int | None] = 1,
-    ) -> dict[str, dict[str, Any]]:
+    ) -> dict[str, dict[str, float | int]]:
         return await self._read_values(
             request=request,
             position=position,

@@ -38,7 +38,7 @@ class BaseSection:
         self._ssl: bool = ssl
         self._session: ClientSession | None = session
 
-    async def _post(self, payload: str | None = None, endpoint: str | None = None) -> list[dict[str, Any]]:
+    async def _post(self, payload: str | None = None, endpoint: str | None = None) -> list[dict[str, str]]:
         """Run a POST request against the API."""
         session: ClientSession = (
             self._session
@@ -86,8 +86,10 @@ class BaseSection:
         return _position
 
     async def _read_values(
-        self, request: Control | list[Control], position: int | None | list[int | None] = 1
-    ) -> dict[str, dict[str, Any]]:
+        self,
+        request: Control | list[Control],
+        position: int | None | list[int | None] = 1,
+    ) -> dict[str, dict[str, float | int]]:
         payload: list[dict[str, str]] = []
 
         if isinstance(request, Outdoor | HotWaterTank | HeatPump | HeatCircuit):
@@ -106,7 +108,7 @@ class BaseSection:
             endpoint=Endpoint.READ_VALUES,
         )
 
-        response: dict[str, dict[str, Any]] = {}
+        response: dict[str, dict[str, float | int]] = {}
         response_item: dict[str, Any] = {}
 
         for p in position:
@@ -177,7 +179,7 @@ class HotWaterTankSection(BaseSection):
 
     async def get_temperature(self, position: int | None = 1) -> float:
         """Get current temperature."""
-        response: dict[str, dict[str, Any]] = await self._read_values(
+        response: dict[str, dict[str, float | int]] = await self._read_values(
             request=HotWaterTank.TEMPERATURE,
             position=position,
         )
@@ -188,12 +190,13 @@ class HotWaterTankSection(BaseSection):
 
     async def get_operating_mode(self, position: int | None = 1) -> int:
         """Get operating mode."""
-        response: dict[str, dict[str, Any]] = await self._read_values(
-            request=HotWaterTank.OPERATING_MODE, position=position
+        response: dict[str, dict[str, float | int]] = await self._read_values(
+            request=HotWaterTank.OPERATING_MODE,
+            position=position,
         )
         _position: str = str(position if position else 1)
         _key: str = self._get_real_key(HotWaterTank.OPERATING_MODE)
-        value: int = response[_position][_key]
+        value: int = int(response[_position][_key])
         return value
 
     async def set_operating_mode(self, mode: int, position: int | None = 1) -> None:
@@ -202,7 +205,7 @@ class HotWaterTankSection(BaseSection):
 
     async def get_min_temperature(self, position: int | None = 1) -> float:
         """Get minimum temperature."""
-        response: dict[str, dict[str, Any]] = await self._read_values(
+        response: dict[str, dict[str, float | int]] = await self._read_values(
             request=HotWaterTank.MIN_TEMPERATURE,
             position=position,
         )
@@ -217,7 +220,7 @@ class HotWaterTankSection(BaseSection):
 
     async def get_max_temperature(self, position: int | None = 1) -> float:
         """Get maximum temperature."""
-        response: dict[str, dict[str, Any]] = await self._read_values(
+        response: dict[str, dict[str, float | int]] = await self._read_values(
             request=HotWaterTank.MAX_TEMPERATURE,
             position=position,
         )
@@ -239,18 +242,18 @@ class HeatPumpSection(BaseSection):
 
     async def get_status(self, position: int | None = 1) -> int:
         """Get status."""
-        response: dict[str, dict[str, Any]] = await self._read_values(
+        response: dict[str, dict[str, float | int]] = await self._read_values(
             request=HeatPump.STATUS,
             position=position,
         )
         _position: str = str(position if position else 1)
         _key: str = self._get_real_key(HeatPump.STATUS)
-        value: int = response[_position][_key]
+        value: int = int(response[_position][_key])
         return value
 
     async def get_circulation_pump(self, position: int | None = 1) -> float:
         """Get circulation pump."""
-        response: dict[str, dict[str, Any]] = await self._read_values(
+        response: dict[str, dict[str, float | int]] = await self._read_values(
             request=HeatPump.CIRCULATION_PUMP,
             position=position,
         )
@@ -261,7 +264,7 @@ class HeatPumpSection(BaseSection):
 
     async def get_inflow_temperature(self, position: int | None = 1) -> float:
         """Get inflow temperature."""
-        response: dict[str, dict[str, Any]] = await self._read_values(
+        response: dict[str, dict[str, float | int]] = await self._read_values(
             request=HeatPump.INFLOW_TEMPERATURE,
             position=position,
         )
@@ -272,7 +275,7 @@ class HeatPumpSection(BaseSection):
 
     async def get_reflux_temperature(self, position: int | None = 1) -> float:
         """Get reflux temperature."""
-        response: dict[str, dict[str, Any]] = await self._read_values(
+        response: dict[str, dict[str, float | int]] = await self._read_values(
             request=HeatPump.REFLUX_TEMPERATURE,
             position=position,
         )
@@ -283,7 +286,7 @@ class HeatPumpSection(BaseSection):
 
     async def get_source_input_temperature(self, position: int | None = 1) -> float:
         """Get source input temperature."""
-        response: dict[str, dict[str, Any]] = await self._read_values(
+        response: dict[str, dict[str, float | int]] = await self._read_values(
             request=HeatPump.SOURCE_INPUT_TEMPERATURE,
             position=position,
         )
@@ -294,7 +297,7 @@ class HeatPumpSection(BaseSection):
 
     async def get_source_output_temperature(self, position: int | None = 1) -> float:
         """Get source output temperature."""
-        response: dict[str, dict[str, Any]] = await self._read_values(
+        response: dict[str, dict[str, float | int]] = await self._read_values(
             request=HeatPump.SOURCE_OUTPUT_TEMPERATURE,
             position=position,
         )
@@ -305,7 +308,7 @@ class HeatPumpSection(BaseSection):
 
     async def get_compressor_input_temperature(self, position: int | None = 1) -> float:
         """Get compressor input temperature."""
-        response: dict[str, dict[str, Any]] = await self._read_values(
+        response: dict[str, dict[str, float | int]] = await self._read_values(
             request=HeatPump.COMPRESSOR_INPUT_TEMPERATURE,
             position=position,
         )
@@ -316,7 +319,7 @@ class HeatPumpSection(BaseSection):
 
     async def get_compressor_output_temperature(self, position: int | None = 1) -> float:
         """Get compressor output temperature."""
-        response: dict[str, dict[str, Any]] = await self._read_values(
+        response: dict[str, dict[str, float | int]] = await self._read_values(
             request=HeatPump.COMPRESSOR_OUTPUT_TEMPERATURE,
             position=position,
         )
@@ -327,7 +330,7 @@ class HeatPumpSection(BaseSection):
 
     async def get_compressor(self, position: int | None = 1) -> float:
         """Get compressor."""
-        response: dict[str, dict[str, Any]] = await self._read_values(
+        response: dict[str, dict[str, float | int]] = await self._read_values(
             request=HeatPump.COMPRESSOR,
             position=position,
         )
@@ -338,7 +341,7 @@ class HeatPumpSection(BaseSection):
 
     async def get_high_pressure(self, position: int | None = 1) -> float:
         """Get high pressure in bar."""
-        response: dict[str, dict[str, Any]] = await self._read_values(
+        response: dict[str, dict[str, float | int]] = await self._read_values(
             request=HeatPump.HIGH_PRESSURE,
             position=position,
         )
@@ -349,7 +352,7 @@ class HeatPumpSection(BaseSection):
 
     async def get_low_pressure(self, position: int | None = 1) -> float:
         """Get low pressure in bar."""
-        response: dict[str, dict[str, Any]] = await self._read_values(
+        response: dict[str, dict[str, float | int]] = await self._read_values(
             request=HeatPump.LOW_PRESSURE,
             position=position,
         )
@@ -367,7 +370,7 @@ class HeatCircuitSection(BaseSection):
 
     async def get_temperature(self, position: int | None = 1) -> float:
         """Get temperature."""
-        response: dict[str, dict[str, Any]] = await self._read_values(
+        response: dict[str, dict[str, float | int]] = await self._read_values(
             request=HeatCircuit.TEMPERATURE,
             position=position,
         )
@@ -378,7 +381,7 @@ class HeatCircuitSection(BaseSection):
 
     async def get_day_temperature(self, position: int | None = 1) -> float:
         """Get day temperature."""
-        response: dict[str, dict[str, Any]] = await self._read_values(
+        response: dict[str, dict[str, float | int]] = await self._read_values(
             request=HeatCircuit.DAY_TEMPERATURE,
             position=position,
         )
@@ -396,7 +399,7 @@ class HeatCircuitSection(BaseSection):
 
     async def get_day_temperature_threshold(self, position: int | None = 1) -> float:
         """Get day temperature threshold."""
-        response: dict[str, dict[str, Any]] = await self._read_values(
+        response: dict[str, dict[str, float | int]] = await self._read_values(
             request=HeatCircuit.DAY_TEMPERATURE_THRESHOLD,
             position=position,
         )
@@ -407,7 +410,7 @@ class HeatCircuitSection(BaseSection):
 
     async def get_night_temperature(self, position: int | None = 1) -> float | None:
         """Get night temperature."""
-        response: dict[str, dict[str, Any]] = await self._read_values(
+        response: dict[str, dict[str, float | int]] = await self._read_values(
             request=HeatCircuit.NIGHT_TEMPERATURE,
             position=position,
         )
@@ -422,7 +425,7 @@ class HeatCircuitSection(BaseSection):
 
     async def get_night_temperature_threshold(self, position: int | None = 1) -> float:
         """Get night temperature threshold."""
-        response: dict[str, dict[str, Any]] = await self._read_values(
+        response: dict[str, dict[str, float | int]] = await self._read_values(
             request=HeatCircuit.NIGHT_TEMPERATURE_THRESHOLD,
             position=position,
         )
@@ -433,7 +436,7 @@ class HeatCircuitSection(BaseSection):
 
     async def get_holiday_temperature(self, position: int | None = 1) -> float:
         """Get holiday temperature."""
-        response: dict[str, dict[str, Any]] = await self._read_values(
+        response: dict[str, dict[str, float | int]] = await self._read_values(
             request=HeatCircuit.HOLIDAY_TEMPERATURE,
             position=position,
         )
@@ -444,7 +447,7 @@ class HeatCircuitSection(BaseSection):
 
     async def get_offset_temperature(self, position: int | None = 1) -> float:
         """Get offset temperature."""
-        response: dict[str, dict[str, Any]] = await self._read_values(
+        response: dict[str, dict[str, float | int]] = await self._read_values(
             request=HeatCircuit.OFFSET_TEMPERATURE,
             position=position,
         )
@@ -459,13 +462,13 @@ class HeatCircuitSection(BaseSection):
 
     async def get_operating_mode(self, position: int | None = 1) -> int:
         """Get operating mode."""
-        response: dict[str, dict[str, Any]] = await self._read_values(
+        response: dict[str, dict[str, float | int]] = await self._read_values(
             request=HeatCircuit.OPERATING_MODE,
             position=position,
         )
         _position: str = str(position if position else 1)
         _key: str = self._get_real_key(HeatCircuit.OPERATING_MODE)
-        value: int = response[_position][_key]
+        value: int = int(response[_position][_key])
         return value
 
     async def set_operating_mode(self, mode: int, position: int | None = 1) -> None:

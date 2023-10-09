@@ -1,5 +1,4 @@
 import asyncio
-from typing import Any
 
 import pytest
 from aiohttp import ClientSession
@@ -109,7 +108,7 @@ class TestKebaKeEnergyAPI:
     async def test_read_values(
         self,
         control: Control,
-        position: int | list[int],
+        position: int | None | list[int | None],
         payload: list[dict[str, str]],
         expected_data: str,
         expected_response: dict[str, dict[str, float | int]],
@@ -122,7 +121,7 @@ class TestKebaKeEnergyAPI:
             )
 
             client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
-            response: dict[str, dict[str, Any]] = await client.read_values(request=control, position=position)
+            response: dict[str, dict[str, float | int]] = await client.read_values(request=control, position=position)
 
             assert isinstance(response, dict)
             assert response == expected_response
@@ -168,8 +167,8 @@ class TestKebaKeEnergyAPI:
     )
     async def test_write_values(
         self,
-        control: dict[Control, Any],
-        position: int | list[int],
+        control: dict[Control, float | int],
+        position: int | None | list[int | None],
         expected_data: str,
     ) -> None:
         with aioresponses() as mock_keenergy_api:
