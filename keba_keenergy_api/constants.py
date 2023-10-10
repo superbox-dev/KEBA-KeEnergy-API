@@ -31,7 +31,8 @@ class HeatCircuitOperatingMode:
     NIGHT: Final[int] = 3
 
 
-OUTDOOR_PREFIX: Final[str] = "APPL.CtrlAppl.sParam"
+OPTIONS_PREFIX: Final[str] = "APPL.CtrlAppl.sParam.options"
+OUTDOOR_PREFIX: Final[str] = "APPL.CtrlAppl.sParam.outdoorTemp"
 HOT_WATER_TANK_PREFIX: Final[str] = "APPL.CtrlAppl.sParam.hotWaterTank"
 HEAT_PUMP_PREFIX: Final[str] = "APPL.CtrlAppl.sParam.heatpump"
 HEAT_CIRCUIT_PREFIX: Final[str] = "APPL.CtrlAppl.sParam.heatCircuit"
@@ -43,8 +44,14 @@ class ControlValue(NamedTuple):
     read_only: bool
 
 
+class Options(Enum):
+    HOT_WATER_TANK_NUMBERS: Final[ControlValue] = ControlValue("systemNumberOfHotWaterTanks", int, read_only=True)
+    HEAT_PUMP_NUMBERS: Final[ControlValue] = ControlValue("systemNumberOfHeatPumps", int, read_only=True)
+    HEAT_CIRCUIT_NUMBERS: Final[ControlValue] = ControlValue("systemNumberOfHeatingCircuits", int, read_only=True)
+
+
 class Outdoor(Enum):
-    TEMPERATURE: Final[ControlValue] = ControlValue("outdoorTemp.values.actValue", float, read_only=True)
+    TEMPERATURE: Final[ControlValue] = ControlValue("values.actValue", float, read_only=True)
 
 
 class HotWaterTank(Enum):
@@ -95,4 +102,4 @@ class HeatCircuit(Enum):
     OPERATING_MODE: Final[ControlValue] = ControlValue("param.operatingMode", int, read_only=False)
 
 
-Control: TypeAlias = Outdoor | HotWaterTank | HeatPump | HeatCircuit
+Control: TypeAlias = Outdoor | Options | HotWaterTank | HeatPump | HeatCircuit

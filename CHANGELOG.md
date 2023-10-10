@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2023-10-10
+
+### Added
+
+- Added `get_number_of_hot_water_tanks()` to read number of hot water tanks.
+- Added `get_number_of_heat_pumps()` to read number of heat pumps.
+- Added `get_number_of_heating_circuits()` to read number of heating circuits.
+- Added automatic set of position numbers for `read_values()` dependent on hardware. 
+
 ## [1.2.0] - 2023-10-09
 
 ### Added

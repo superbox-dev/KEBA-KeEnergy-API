@@ -38,24 +38,22 @@ async def main() -> None:
     heat_circuit_temperature: float = await client.heat_circuit.get_temperature(position=2)
 
     # Read multiple values
-    data: dict[str, dict[str, Any]] = await client.read_values(
+    data: dict[str, tuple[float | int]] = await client.read_values(
         request=[
             HeatCircuit.TEMPERATURE, 
             HeatCircuit.DAY_TEMPERATURE,
         ],
-        position=1,
     )
     
-    # Enable "day" mode for heat circuit
-    await client.heat_circuit.set_operating_mode(mode=HeatCircuitOperatingMode.DAY)
+    # Enable "day" mode for heat circuit 2
+    await client.heat_circuit.set_operating_mode(mode=HeatCircuitOperatingMode.DAY, position=2)
 
     # Write multiple values
     await client.write_values(
         request={
-            HeatCircuit.DAY_TEMPERATURE: 20, 
-            HeatCircuit.NIGHT_TEMPERATURE: 16,
+            HeatCircuit.DAY_TEMPERATURE: (20, None, 5),  # Write heat circuit on position 1 and 3 
+            HeatCircuit.NIGHT_TEMPERATURE: (16,),        # Write night temperature on position 1
         },
-        position=1,
     )
 
 
@@ -84,11 +82,11 @@ asyncio.run(main())
 
 ### API endpoints
 
-| Endpoint                           | Response | Description                                  |
-|------------------------------------|----------|----------------------------------------------|
-| `.get_outdoor_temperature()`       | `float`  | Get outdoor temperature.                     |
-| `.read_values(request, position)`  |          | Get multiple values with one http request.   |
-| `.write_values(request, position)` |          | Write multiple values with one http request. |
+| Endpoint                          | Response | Description                                  |
+|-----------------------------------|----------|----------------------------------------------|
+| `.get_outdoor_temperature()`      | `float`  | Get outdoor temperature.                     |
+| `.read_values(request, position)` |          | Get multiple values with one http request.   |
+| `.write_values(request)`          |          | Write multiple values with one http request. |
 
 #### Device
 

@@ -85,7 +85,7 @@ line-length = 120
 select = ["ALL"]
 ignore = [
     "ANN101",  # missing-type-self
-    "D",
+    "D100",    # undocumented-public-module
     "D101",    # undocumented-public-class
     "D104",    # undocumented-public-package
     "D105",    # undocumented-magic-method
