@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2023-10-11
+
+### Added
+
+- Added `get_device_info()` to read all device information e.g. serial number as `dict`.
+
 ## [1.3.0] - 2023-10-10
 
 ### Added

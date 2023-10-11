@@ -220,24 +220,30 @@ class DeviceSection(BaseSection):
     def __init__(self, base_url: str, *, ssl: bool, session: ClientSession | None = None) -> None:
         super().__init__(base_url=base_url, ssl=ssl, session=session)
 
+    async def get_device_info(self) -> dict[str, Any]:
+        """Get device info."""
+        response: Response = await self._post(endpoint=Endpoint.DEVICE_INFO)
+        response[0].pop("ret")
+        return response[0]
+
     async def get_name(self) -> str:
         """Get name."""
-        response: list[dict[str, Any]] = await self._post(endpoint=Endpoint.DEVICE_INFO)
+        response: Response = await self._post(endpoint=Endpoint.DEVICE_INFO)
         return str(response[0]["name"])
 
     async def get_serial_number(self) -> int:
         """Get serial_number."""
-        response: list[dict[str, Any]] = await self._post(endpoint=Endpoint.DEVICE_INFO)
+        response: Response = await self._post(endpoint=Endpoint.DEVICE_INFO)
         return int(response[0]["serNo"])
 
     async def get_revision_number(self) -> int:
         """Get revision name."""
-        response: list[dict[str, Any]] = await self._post(endpoint=Endpoint.DEVICE_INFO)
+        response: Response = await self._post(endpoint=Endpoint.DEVICE_INFO)
         return int(response[0]["revNo"])
 
     async def get_variant_number(self) -> int:
         """Get variant name."""
-        response: list[dict[str, Any]] = await self._post(endpoint=Endpoint.DEVICE_INFO)
+        response: Response = await self._post(endpoint=Endpoint.DEVICE_INFO)
         return int(response[0]["variantNo"])
 
 

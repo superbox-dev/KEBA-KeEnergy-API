@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 from aioresponses.core import aioresponses
 
@@ -8,6 +10,43 @@ from keba_keenergy_api.endpoints import Position
 
 
 class TestDeviceSection:
+    @pytest.mark.asyncio()
+    async def test_device_info(self) -> None:
+        """Test get device info from hardware."""
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/deviceControl?action=getDeviceInfo",
+                payload=[
+                    {
+                        "ret": "OK",
+                        "revNo": 2,
+                        "orderNo": 12345678,
+                        "serNo": 12345678,
+                        "name": "MOCKED-NAME",
+                        "variantNo": 0,
+                    },
+                ],
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
+
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+            response: dict[str, Any] = await client.device.get_device_info()
+
+            assert isinstance(response, dict)
+            assert response == {
+                "revNo": 2,
+                "orderNo": 12345678,
+                "serNo": 12345678,
+                "name": "MOCKED-NAME",
+                "variantNo": 0,
+            }
+
+            mock_keenergy_api.assert_called_once_with(
+                url="http://mocked-host/deviceControl?action=getDeviceInfo",
+                method="POST",
+                ssl=False,
+            )
+
     @pytest.mark.asyncio()
     async def test_get_name(self) -> None:
         """Test get device name from hardware."""
