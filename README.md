@@ -90,12 +90,13 @@ asyncio.run(main())
 
 #### Device
 
-| Endpoint                 | Response | Description        |
-|--------------------------|----------|--------------------|
-| `.get_name()`            | `str`    | Get name.          |
-| `.get_serial_number()`   | `int`    | Get serial number. |
-| `.get_revision_number()` | `int`    | Get revision name. |
-| `.get_variant_number()`  | `int`    | Get variant name.  |
+| Endpoint                 | Response | Description                 |
+|--------------------------|----------|-----------------------------|
+| `.get_device_info()`     | `str`    | Get all device information. |
+| `.get_name()`            | `str`    | Get name.                   |
+| `.get_serial_number()`   | `int`    | Get serial number.          |
+| `.get_revision_number()` | `int`    | Get revision name.          |
+| `.get_variant_number()`  | `int`    | Get variant name.           |
 
 #### Hot water tank
 
