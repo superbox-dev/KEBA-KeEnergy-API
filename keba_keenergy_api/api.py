@@ -21,15 +21,14 @@ class KebaKeEnergyAPI(BaseSection):
     def __init__(self, host: str, *, ssl: bool = False, session: ClientSession | None = None) -> None:
         """Initialize with Client Session and host."""
         schema: str = "https" if ssl else "http"
-        self.device_url: str = f"{schema}://{host}"
+        base_url: str = f"{schema}://{host}"
 
-        self.device: DeviceSection = DeviceSection(base_url=self.device_url, ssl=ssl, session=session)
-        self.options: OptionsSection = OptionsSection(base_url=self.device_url, ssl=ssl, session=session)
-        self.hot_water_tank: HotWaterTankSection = HotWaterTankSection(
-            base_url=self.device_url, ssl=ssl, session=session
-        )
-        self.heat_pump: HeatPumpSection = HeatPumpSection(base_url=self.device_url, ssl=ssl, session=session)
-        self.heat_circuit: HeatCircuitSection = HeatCircuitSection(base_url=self.device_url, ssl=ssl, session=session)
+        self.device_url: str = base_url
+        self.device: DeviceSection = DeviceSection(base_url=base_url, ssl=ssl, session=session)
+        self.options: OptionsSection = OptionsSection(base_url=base_url, ssl=ssl, session=session)
+        self.hot_water_tank: HotWaterTankSection = HotWaterTankSection(base_url, ssl=ssl, session=session)
+        self.heat_pump: HeatPumpSection = HeatPumpSection(base_url=base_url, ssl=ssl, session=session)
+        self.heat_circuit: HeatCircuitSection = HeatCircuitSection(base_url=base_url, ssl=ssl, session=session)
 
         super().__init__(base_url=self.device_url, ssl=ssl, session=session)
 
