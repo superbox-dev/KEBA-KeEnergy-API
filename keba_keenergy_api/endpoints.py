@@ -120,8 +120,8 @@ class BaseSection:
 
         if isinstance(position, Position):
             position_key: str = f"{self.KEY_PATTERN.sub('_', control.__class__.__name__).lower()}"
-            position: int | None = getattr(position, position_key, None)
-            idx = list(range(position)) if position else [None]
+            _position: int | None = getattr(position, position_key, None)
+            idx = list(range(_position)) if _position else [None]
         elif isinstance(position, list):
             idx = [p if p is None else (p - 1) for p in position]
 
