@@ -247,6 +247,12 @@ class DeviceSection(BaseSection):
         response: Response = await self._post(endpoint=Endpoint.DEVICE_INFO)
         return int(response[0]["variantNo"])
 
+    async def get_system_info(self) -> dict[str, Any]:
+        """Get system information."""
+        response: Response = await self._post(endpoint=Endpoint.SYSTEM_INFO)
+        response[0].pop("ret")
+        return response[0]
+
 
 class OptionsSection(BaseSection):
     """Class to retrieve the option data."""

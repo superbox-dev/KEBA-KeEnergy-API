@@ -11,6 +11,7 @@ class Endpoint:
     READ_VALUES: Final[str] = "/var/readWriteVars"
     WRITE_VALUES: Final[str] = "/var/readWriteVars?action=set"
     DEVICE_INFO: Final[str] = "/deviceControl?action=getDeviceInfo"
+    SYSTEM_INFO: Final[str] = "/swupdate?action=getSystemInstalled"
 
 
 class HotWaterTankOperatingMode:

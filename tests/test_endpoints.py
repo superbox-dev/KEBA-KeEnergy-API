@@ -171,6 +171,37 @@ class TestDeviceSection:
                 ssl=False,
             )
 
+    @pytest.mark.asyncio()
+    async def test_get_system_info(self) -> None:
+        """Test get system information."""
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/swupdate?action=getSystemInstalled",
+                payload=[
+                    {
+                        "ret": "OK",
+                        "name": "KeEnergy.MTec",
+                        "version": "2.2.2",
+                    },
+                ],
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
+
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+            data: dict[str, Any] = await client.device.get_system_info()
+
+            assert isinstance(data, dict)
+            assert data == {
+                "name": "KeEnergy.MTec",
+                "version": "2.2.2",
+            }
+
+            mock_keenergy_api.assert_called_once_with(
+                url="http://mocked-host/swupdate?action=getSystemInstalled",
+                method="POST",
+                ssl=False,
+            )
+
 
 class TestOptionSection:
     @pytest.mark.asyncio()
