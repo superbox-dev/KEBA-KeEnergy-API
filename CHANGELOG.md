@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.2] - 2023-10-13
+
+### Added
+
+- Get the device url with `client.device_url`
+
 ## [1.4.1] - 2023-10-11
 
 ### Changed
