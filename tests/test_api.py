@@ -9,6 +9,7 @@ from keba_keenergy_api.constants import Control
 from keba_keenergy_api.constants import HeatCircuit
 from keba_keenergy_api.constants import HeatPump
 from keba_keenergy_api.constants import HotWaterTank
+from keba_keenergy_api.constants import Outdoor
 from keba_keenergy_api.endpoints import ValueResponse
 from keba_keenergy_api.error import APIError
 from keba_keenergy_api.error import InvalidJsonError
@@ -110,7 +111,7 @@ class TestKebaKeEnergyAPI:
                 },
             ),
             (
-                [HeatCircuit.TEMPERATURE, HeatPump.INFLOW_TEMPERATURE],
+                [Outdoor.TEMPERATURE, HeatCircuit.TEMPERATURE, HeatPump.INFLOW_TEMPERATURE],
                 None,
                 [
                     {"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatPumps", "value": "2"},
@@ -118,16 +119,19 @@ class TestKebaKeEnergyAPI:
                     {"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHotWaterTanks", "value": "1"},
                 ],
                 [
+                    {"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue", "value": "17.54"},
                     {"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue", "value": "10.808357"},
                     {"name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatFlow.values.actValue", "value": "24.200001"},
                     {"name": "APPL.CtrlAppl.sParam.heatpump[1].TempHeatFlow.values.actValue", "value": "23.200001"},
                 ],
                 (
-                    '[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue"}, '
+                    '[{"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue"}, '
+                    '{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue"}, '
                     '{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatFlow.values.actValue"}, '
                     '{"name": "APPL.CtrlAppl.sParam.heatpump[1].TempHeatFlow.values.actValue"}]'
                 ),
                 {
+                    "OUTDOOR_TEMPERATURE": (17.54,),
                     "HEAT_CIRCUIT_TEMPERATURE": (10.81,),
                     "HEAT_PUMP_INFLOW_TEMPERATURE": (
                         24.2,
