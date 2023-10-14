@@ -41,7 +41,7 @@ HEAT_CIRCUIT_PREFIX: Final[str] = "APPL.CtrlAppl.sParam.heatCircuit"
 
 class ControlValue(NamedTuple):
     value: str
-    data_type: type[float | int]
+    data_type: type[float | int | str]
     read_only: bool
 
 
@@ -63,6 +63,7 @@ class HotWaterTank(Enum):
 
 
 class HeatPump(Enum):
+    NAME: Final[ControlValue] = ControlValue("param.name", str, read_only=True)
     STATUS: Final[ControlValue] = ControlValue("values.heatpumpState", int, read_only=False)
     CIRCULATION_PUMP: Final[ControlValue] = ControlValue("CircPump.values.setValueScaled", float, read_only=True)
     INFLOW_TEMPERATURE: Final[ControlValue] = ControlValue("TempHeatFlow.values.actValue", float, read_only=True)

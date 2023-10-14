@@ -382,6 +382,16 @@ class HeatPumpSection(BaseSection):
     def __init__(self, base_url: str, *, ssl: bool, session: ClientSession | None = None) -> None:
         super().__init__(base_url=base_url, ssl=ssl, session=session)
 
+    async def get_name(self, position: int | None = 1) -> str:
+        """Get model name."""
+        response: ValueResponse = await self._read_values(
+            request=HeatPump.NAME,
+            position=position,
+        )
+        _idx: int = position - 1 if position else 0
+        _key: str = self._get_real_key(HeatPump.NAME)
+        return str(response[_key][_idx])
+
     async def get_status(self, position: int | None = 1) -> int:
         """Get status."""
         response: ValueResponse = await self._read_values(

@@ -114,6 +114,7 @@ asyncio.run(main())
 
 | Endpoint                               | Response | Description                                                                 |
 |----------------------------------------|----------|-----------------------------------------------------------------------------|
+| `.get_name()`                          | `str`    | Get head pump model name.                                                   |
 | `.get_status()`                        | `int`    | Get operating mode as integer (0 is `STANDBY`, 1 is `FLOW` and 2 is `AUTO`. |
 | `.get_circulation_pump()`              | `float`  | Get circulation pump in percent.                                            |
 | `.get_inflow_temperature()`            | `float`  | Get inflow temperature.                                                     |

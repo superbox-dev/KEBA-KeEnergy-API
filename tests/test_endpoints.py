@@ -501,6 +501,29 @@ class TestHotWaterTankSection:
 
 class TestHeatPumpSection:
     @pytest.mark.asyncio()
+    async def test_get_name(self) -> None:
+        """Test get name for heat pump."""
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/var/readWriteVars",
+                payload=[{"name": "APPL.CtrlAppl.sParam.heatpump[0].param.name", "value": "WPS26"}],
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
+
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+            data: str = await client.heat_pump.get_name()
+
+            assert isinstance(data, str)
+            assert data == "WPS26"
+
+            mock_keenergy_api.assert_called_once_with(
+                url="http://mocked-host/var/readWriteVars",
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].param.name"}]',
+                method="POST",
+                ssl=False,
+            )
+
+    @pytest.mark.asyncio()
     async def test_get_status(self) -> None:
         """Test get status for heat pump."""
         with aioresponses() as mock_keenergy_api:
