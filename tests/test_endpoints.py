@@ -437,12 +437,21 @@ class TestHotWaterTankSection:
         operating_mode: int | str,
     ) -> None:
         """Test set operating mode for hot water tank."""
-        client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/var/readWriteVars?action=set",
+                payload={},
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
 
-        with pytest.raises(APIError) as error:
-            await client.hot_water_tank.set_operating_mode(operating_mode)
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
 
-        assert str(error.value) == "Invalid operating mode!"
+            with pytest.raises(APIError) as error:
+                await client.hot_water_tank.set_operating_mode(operating_mode)
+
+            assert str(error.value) == "Invalid operating mode!"
+
+            mock_keenergy_api.assert_not_called()
 
     @pytest.mark.asyncio()
     async def test_get_min_temperature(self) -> None:
@@ -1179,9 +1188,18 @@ class TestHeatCircuitSection:
         operating_mode: int,
     ) -> None:
         """Test set operating mode heat circuit."""
-        client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/var/readWriteVars?action=set",
+                payload={},
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
 
-        with pytest.raises(APIError) as error:
-            await client.heat_circuit.set_operating_mode(operating_mode)
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
 
-        assert str(error.value) == "Invalid operating mode!"
+            with pytest.raises(APIError) as error:
+                await client.heat_circuit.set_operating_mode(operating_mode)
+
+            assert str(error.value) == "Invalid operating mode!"
+
+            mock_keenergy_api.assert_not_called()
