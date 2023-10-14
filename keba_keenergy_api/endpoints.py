@@ -20,7 +20,6 @@ from keba_keenergy_api.constants import Endpoint
 from keba_keenergy_api.constants import HeatCircuit
 from keba_keenergy_api.constants import HeatCircuitOperatingMode
 from keba_keenergy_api.constants import HeatPump
-from keba_keenergy_api.constants import HeatPumpStatus
 from keba_keenergy_api.constants import HotWaterTank
 from keba_keenergy_api.constants import HotWaterTankOperatingMode
 from keba_keenergy_api.constants import Options
@@ -41,7 +40,7 @@ class WritePayload(TypedDict):
     value: str
 
 
-ValueResponse: TypeAlias = dict[str, tuple[float | int, ...]]
+ValueResponse: TypeAlias = dict[str, tuple[float | int | str, ...]]
 Payload: TypeAlias = list[ReadPayload | WritePayload]
 Response: TypeAlias = list[dict[str, str]]
 
@@ -156,6 +155,7 @@ class BaseSection:
         allowed_type: type[Enum] | list[type[Enum]] | None = None,
         *,
         key_prefix: bool = True,
+        human_readable: bool = True,
     ) -> ValueResponse:
         if isinstance(request, Options | Outdoor | HotWaterTank | HeatPump | HeatCircuit):
             request = [request]
@@ -177,18 +177,25 @@ class BaseSection:
             endpoint=Endpoint.READ_VALUES,
         )
 
-        response: dict[str, list[float | int]] = {}
+        response: dict[str, list[float | int | str]] = {}
 
         for control in request:
             if (allowed_type and type(control) in allowed_type) or not allowed_type:
                 for _ in self._get_position_index(control=control, position=position):
-                    value: float | int = control.value.data_type(_response[0]["value"])
                     response_key: str = self._get_real_key(control, key_prefix=key_prefix)
 
                     if not response.get(response_key):
                         response[response_key] = []
 
-                    response[response_key].append(round(value, 2) if isinstance(value, float) else value)
+                    value: float | int | str = control.value.data_type(_response[0]["value"])
+                    value = round(value, 2) if isinstance(value, float) else value
+                    value = (
+                        control.value.human_readable(value).name.lower()
+                        if (human_readable and control.value.human_readable)
+                        else value
+                    )
+
+                    response[response_key].append(value)
                     del _response[0]
 
         return {k: tuple(v) for k, v in response.items()}
@@ -338,12 +345,17 @@ class HotWaterTankSection(BaseSection):
         response: ValueResponse = await self._read_values(
             request=HotWaterTank.OPERATING_MODE,
             position=position,
+            human_readable=human_readable,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HotWaterTank.OPERATING_MODE)
-        _value: int = int(response[_key][_idx])
 
-        return HotWaterTankOperatingMode(_value).name.lower() if human_readable else _value
+        try:
+            _value: int | str = int(response[_key][_idx])
+        except ValueError:
+            _value = str(response[_key][_idx])
+
+        return _value
 
     async def set_operating_mode(self, mode: int | str, position: int = 1) -> None:
         """Set operating mode."""
@@ -409,12 +421,17 @@ class HeatPumpSection(BaseSection):
         response: ValueResponse = await self._read_values(
             request=HeatPump.STATUS,
             position=position,
+            human_readable=human_readable,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HeatPump.STATUS)
-        _value: int = int(response[_key][_idx])
 
-        return HeatPumpStatus(_value).name.lower() if human_readable else _value
+        try:
+            _value: int | str = int(response[_key][_idx])
+        except ValueError:
+            _value = str(response[_key][_idx])
+
+        return _value
 
     async def get_circulation_pump(self, position: int | None = 1) -> float:
         """Get circulation pump."""
@@ -623,12 +640,17 @@ class HeatCircuitSection(BaseSection):
         response: ValueResponse = await self._read_values(
             request=HeatCircuit.OPERATING_MODE,
             position=position,
+            human_readable=human_readable,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HeatCircuit.OPERATING_MODE)
-        _value: int = int(response[_key][_idx])
 
-        return HeatCircuitOperatingMode(_value).name.lower() if human_readable else _value
+        try:
+            _value: int | str = int(response[_key][_idx])
+        except ValueError:
+            _value = str(response[_key][_idx])
+
+        return _value
 
     async def set_operating_mode(self, mode: int | str, position: int = 1) -> None:
         """Set operating mode."""

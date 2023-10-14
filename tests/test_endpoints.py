@@ -370,7 +370,7 @@ class TestHotWaterTankSection:
         self,
         human_readable: bool,  # noqa: FBT001
         payload_value: int,
-        expected_value: int | str,
+        expected_value: str,
     ) -> None:
         """Test get operating mode for hot water tank."""
         with aioresponses() as mock_keenergy_api:
@@ -1116,7 +1116,7 @@ class TestHeatCircuitSection:
         self,
         human_readable: bool,  # noqa: FBT001
         payload_value: int,
-        expected_value: int | str,
+        expected_value: str,
     ) -> None:
         """Test get operating mode for heat circuit."""
         with aioresponses() as mock_keenergy_api:
@@ -1132,7 +1132,7 @@ class TestHeatCircuitSection:
             )
 
             client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
-            data: int | str | None = await client.heat_circuit.get_operating_mode(human_readable=human_readable)
+            data: int | str = await client.heat_circuit.get_operating_mode(human_readable=human_readable)
 
             assert isinstance(data, (int | str))
             assert data == expected_value

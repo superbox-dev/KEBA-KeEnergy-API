@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added `heat_pump.get_name()` to read the **heat pump** name.
 - Added `heat_circuit.get_name()` to read the **heat circuit** name.
+- Added `human_readable` attribute to `read_values()` to get a human-readable name and not a number as response e.g. for `hot_water_tank.get_operating_mode()`
 
 ## [1.5.0] - 2023-10-13
 

@@ -36,6 +36,8 @@ class KebaKeEnergyAPI(BaseSection):
         self,
         request: Control | list[Control],
         position: Position | int | list[int | None] | None = None,
+        *,
+        human_readable: bool = True,
     ) -> ValueResponse:
         """Read multiple values from API with one request."""
         if position is None:
@@ -44,6 +46,7 @@ class KebaKeEnergyAPI(BaseSection):
         return await self._read_values(
             request=request,
             position=position,
+            human_readable=human_readable,
         )
 
     async def write_values(self, request: dict[Control, tuple[float | int | None, ...]]) -> None:
