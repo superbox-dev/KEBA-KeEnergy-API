@@ -367,14 +367,20 @@ class TestHotWaterTankSection:
         [(True, 3, "heat_up"), (False, 3, 3)],
     )
     async def test_get_operating_mode(
-        self, human_readable: bool, payload_value: int, expected_value: int | str
+        self,
+        human_readable: bool,  # noqa: FBT001
+        payload_value: int,
+        expected_value: int | str,
     ) -> None:
         """Test get operating mode for hot water tank."""
         with aioresponses() as mock_keenergy_api:
             mock_keenergy_api.post(
                 "http://mocked-host/var/readWriteVars",
                 payload=[
-                    {"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.operatingMode", "value": f"{payload_value}"}
+                    {
+                        "name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.operatingMode",
+                        "value": f"{payload_value}",
+                    },
                 ],
                 headers={"Content-Type": "application/json;charset=utf-8"},
             )
@@ -423,15 +429,12 @@ class TestHotWaterTankSection:
 
     @pytest.mark.asyncio()
     @pytest.mark.parametrize(
-        ("operating_mode", "expected_value"),
-        [
-            ("INVALID", 0),
-        ],
+        "operating_mode",
+        ["INVALID"],
     )
     async def test_set_invalid_operating_mode(
         self,
         operating_mode: int | str,
-        expected_value: int,
     ) -> None:
         """Test set operating mode for hot water tank."""
         with aioresponses() as mock_keenergy_api:
@@ -566,13 +569,21 @@ class TestHeatPumpSection:
         ("human_readable", "payload_value", "expected_value"),
         [(True, 1, "flow"), (False, 1, 1)],
     )
-    async def test_get_status(self, human_readable: bool, payload_value: int, expected_value: int | str) -> None:
+    async def test_get_status(
+        self,
+        human_readable: bool,  # noqa: FBT001
+        payload_value: int,
+        expected_value: int | str,
+    ) -> None:
         """Test get status for heat pump."""
         with aioresponses() as mock_keenergy_api:
             mock_keenergy_api.post(
                 "http://mocked-host/var/readWriteVars",
                 payload=[
-                    {"name": "APPL.CtrlAppl.sParam.heatpump[0].values.heatpumpState", "value": f"{payload_value}"}
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatpump[0].values.heatpumpState",
+                        "value": f"{payload_value}",
+                    },
                 ],
                 headers={"Content-Type": "application/json;charset=utf-8"},
             )
@@ -1102,14 +1113,20 @@ class TestHeatCircuitSection:
         [(True, 3, "night"), (False, 3, 3)],
     )
     async def test_get_operating_mode(
-        self, human_readable: bool, payload_value: int, expected_value: int | str
+        self,
+        human_readable: bool,  # noqa: FBT001
+        payload_value: int,
+        expected_value: int | str,
     ) -> None:
         """Test get operating mode for heat circuit."""
         with aioresponses() as mock_keenergy_api:
             mock_keenergy_api.post(
                 "http://mocked-host/var/readWriteVars",
                 payload=[
-                    {"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.operatingMode", "value": f"{payload_value}"}
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.operatingMode",
+                        "value": f"{payload_value}",
+                    },
                 ],
                 headers={"Content-Type": "application/json;charset=utf-8"},
             )
@@ -1163,15 +1180,12 @@ class TestHeatCircuitSection:
 
     @pytest.mark.asyncio()
     @pytest.mark.parametrize(
-        ("operating_mode", "expected_value"),
-        [
-            ("INVALID", 0),
-        ],
+        "operating_mode",
+        ["INVALID"],
     )
     async def test_set_invalid_operating_mode(
         self,
         operating_mode: int,
-        expected_value: int,
     ) -> None:
         """Test set operating mode heat circuit."""
         with aioresponses() as mock_keenergy_api:
