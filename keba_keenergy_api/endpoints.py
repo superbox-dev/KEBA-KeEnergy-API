@@ -18,8 +18,11 @@ from keba_keenergy_api.constants import API_DEFAULT_TIMEOUT
 from keba_keenergy_api.constants import Control
 from keba_keenergy_api.constants import Endpoint
 from keba_keenergy_api.constants import HeatCircuit
+from keba_keenergy_api.constants import HeatCircuitOperatingMode
 from keba_keenergy_api.constants import HeatPump
+from keba_keenergy_api.constants import HeatPumpStatus
 from keba_keenergy_api.constants import HotWaterTank
+from keba_keenergy_api.constants import HotWaterTankOperatingMode
 from keba_keenergy_api.constants import Options
 from keba_keenergy_api.constants import Outdoor
 from keba_keenergy_api.error import APIError
@@ -193,13 +196,13 @@ class BaseSection:
     def _generate_write_payload(self, request: dict[Control, tuple[float | int | None, ...]]) -> Payload:
         payload: Payload = []
 
-        for key, values in request.items():
-            if not key.value.read_only:
+        for control, values in request.items():
+            if not control.value.read_only:
                 for idx, value in enumerate(values):
                     if value is not None:
                         payload += [
                             WritePayload(
-                                name=f"{self._get_key_prefix(key)}{self._get_position(idx)}.{key.value.value}",
+                                name=f"{self._get_key_prefix(control)}{self._get_position(idx)}.{control.value.value}",
                                 value=str(value),
                             ),
                         ]
@@ -330,7 +333,7 @@ class HotWaterTankSection(BaseSection):
         _key: str = self._get_real_key(HotWaterTank.TEMPERATURE)
         return float(response[_key][_idx])
 
-    async def get_operating_mode(self, position: int | None = 1) -> int:
+    async def get_operating_mode(self, position: int | None = 1, *, human_readable: bool = True) -> int | str:
         """Get operating mode."""
         response: ValueResponse = await self._read_values(
             request=HotWaterTank.OPERATING_MODE,
@@ -338,11 +341,20 @@ class HotWaterTankSection(BaseSection):
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HotWaterTank.OPERATING_MODE)
-        return int(response[_key][_idx])
+        _value: int = int(response[_key][_idx])
 
-    async def set_operating_mode(self, mode: int, position: int = 1) -> None:
+        return HotWaterTankOperatingMode(_value).name.lower() if human_readable else _value
+
+    async def set_operating_mode(self, mode: int | str, position: int = 1) -> None:
         """Set operating mode."""
-        modes: list[int | None] = [mode if position == p else None for p in range(1, position + 1)]
+        try:
+            _mode: int | None = mode if isinstance(mode, int) else getattr(HotWaterTankOperatingMode, mode)
+        except AttributeError as error:
+            msg: str = "Invalid operating mode!"
+            raise APIError(msg) from error
+
+        modes: list[int | None] = [_mode if position == p else None for p in range(1, position + 1)]
+
         await self._write_values(request={HotWaterTank.OPERATING_MODE: tuple(modes)})
 
     async def get_min_temperature(self, position: int | None = 1) -> float:
@@ -383,7 +395,7 @@ class HeatPumpSection(BaseSection):
         super().__init__(base_url=base_url, ssl=ssl, session=session)
 
     async def get_name(self, position: int | None = 1) -> str:
-        """Get model name."""
+        """Get heat pump name."""
         response: ValueResponse = await self._read_values(
             request=HeatPump.NAME,
             position=position,
@@ -392,7 +404,7 @@ class HeatPumpSection(BaseSection):
         _key: str = self._get_real_key(HeatPump.NAME)
         return str(response[_key][_idx])
 
-    async def get_status(self, position: int | None = 1) -> int:
+    async def get_status(self, position: int | None = 1, *, human_readable: bool = True) -> int | str:
         """Get status."""
         response: ValueResponse = await self._read_values(
             request=HeatPump.STATUS,
@@ -400,7 +412,9 @@ class HeatPumpSection(BaseSection):
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HeatPump.STATUS)
-        return int(response[_key][_idx])
+        _value: int = int(response[_key][_idx])
+
+        return HeatPumpStatus(_value).name.lower() if human_readable else _value
 
     async def get_circulation_pump(self, position: int | None = 1) -> float:
         """Get circulation pump."""
@@ -509,6 +523,16 @@ class HeatCircuitSection(BaseSection):
     def __init__(self, base_url: str, *, ssl: bool, session: ClientSession | None = None) -> None:
         super().__init__(base_url=base_url, ssl=ssl, session=session)
 
+    async def get_name(self, position: int | None = 1) -> str:
+        """Get heat circuit name."""
+        response: ValueResponse = await self._read_values(
+            request=HeatCircuit.NAME,
+            position=position,
+        )
+        _idx: int = position - 1 if position else 0
+        _key: str = self._get_real_key(HeatCircuit.NAME)
+        return str(response[_key][_idx])
+
     async def get_temperature(self, position: int | None = 1) -> float:
         """Get temperature."""
         response: ValueResponse = await self._read_values(
@@ -594,7 +618,7 @@ class HeatCircuitSection(BaseSection):
         offsets: list[float | None] = [offset if position == p else None for p in range(1, position + 1)]
         await self._write_values(request={HeatCircuit.OFFSET_TEMPERATURE: tuple(offsets)})
 
-    async def get_operating_mode(self, position: int | None = 1) -> int:
+    async def get_operating_mode(self, position: int | None = 1, *, human_readable: bool = True) -> int | str:
         """Get operating mode."""
         response: ValueResponse = await self._read_values(
             request=HeatCircuit.OPERATING_MODE,
@@ -602,9 +626,18 @@ class HeatCircuitSection(BaseSection):
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HeatCircuit.OPERATING_MODE)
-        return int(response[_key][_idx])
+        _value: int = int(response[_key][_idx])
 
-    async def set_operating_mode(self, mode: int, position: int = 1) -> None:
+        return HeatCircuitOperatingMode(_value).name.lower() if human_readable else _value
+
+    async def set_operating_mode(self, mode: int | str, position: int = 1) -> None:
         """Set operating mode."""
-        modes: list[int | None] = [mode if position == p else None for p in range(1, position + 1)]
+        try:
+            _mode: int | None = mode if isinstance(mode, int) else getattr(HeatCircuitOperatingMode, mode)
+        except AttributeError as error:
+            msg: str = "Invalid operating mode!"
+            raise APIError(msg) from error
+
+        modes: list[int | None] = [_mode if position == p else None for p in range(1, position + 1)]
+
         await self._write_values(request={HeatCircuit.OPERATING_MODE: tuple(modes)})

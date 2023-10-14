@@ -7,6 +7,7 @@ from keba_keenergy_api.api import KebaKeEnergyAPI
 from keba_keenergy_api.constants import HeatCircuitOperatingMode
 from keba_keenergy_api.constants import HotWaterTankOperatingMode
 from keba_keenergy_api.endpoints import Position
+from keba_keenergy_api.error import APIError
 
 
 class TestDeviceSection:
@@ -361,20 +362,28 @@ class TestHotWaterTankSection:
             )
 
     @pytest.mark.asyncio()
-    async def test_get_operating_mode(self) -> None:
+    @pytest.mark.parametrize(
+        ("human_readable", "payload_value", "expected_value"),
+        [(True, 3, "heat_up"), (False, 3, 3)],
+    )
+    async def test_get_operating_mode(
+        self, human_readable: bool, payload_value: int, expected_value: int | str
+    ) -> None:
         """Test get operating mode for hot water tank."""
         with aioresponses() as mock_keenergy_api:
             mock_keenergy_api.post(
                 "http://mocked-host/var/readWriteVars",
-                payload=[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.operatingMode", "value": "3"}],
+                payload=[
+                    {"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.operatingMode", "value": f"{payload_value}"}
+                ],
                 headers={"Content-Type": "application/json;charset=utf-8"},
             )
 
             client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
-            data: int = await client.hot_water_tank.get_operating_mode()
+            data: int | str = await client.hot_water_tank.get_operating_mode(human_readable=human_readable)
 
-            assert isinstance(data, int)
-            assert data == HotWaterTankOperatingMode.HEAT_UP
+            assert isinstance(data, (int | str))
+            assert data == expected_value
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
@@ -386,11 +395,11 @@ class TestHotWaterTankSection:
     @pytest.mark.asyncio()
     @pytest.mark.parametrize(
         ("operating_mode", "expected_value"),
-        [(HotWaterTankOperatingMode.OFF, 0), (HotWaterTankOperatingMode.HEAT_UP, 3)],
+        [("OFF", 0), (HotWaterTankOperatingMode.HEAT_UP, 3)],
     )
     async def test_set_operating_mode(
         self,
-        operating_mode: int,
+        operating_mode: int | str,
         expected_value: int,
     ) -> None:
         """Test set operating mode for hot water tank."""
@@ -411,6 +420,35 @@ class TestHotWaterTankSection:
                 method="POST",
                 ssl=False,
             )
+
+    @pytest.mark.asyncio()
+    @pytest.mark.parametrize(
+        ("operating_mode", "expected_value"),
+        [
+            ("INVALID", 0),
+        ],
+    )
+    async def test_set_invalid_operating_mode(
+        self,
+        operating_mode: int | str,
+        expected_value: int,
+    ) -> None:
+        """Test set operating mode for hot water tank."""
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/var/readWriteVars?action=set",
+                payload={},
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
+
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+
+            with pytest.raises(APIError) as error:
+                await client.hot_water_tank.set_operating_mode(operating_mode)
+
+            assert str(error.value) == "Invalid operating mode!"
+
+            mock_keenergy_api.assert_not_called()
 
     @pytest.mark.asyncio()
     async def test_get_min_temperature(self) -> None:
@@ -524,20 +562,26 @@ class TestHeatPumpSection:
             )
 
     @pytest.mark.asyncio()
-    async def test_get_status(self) -> None:
+    @pytest.mark.parametrize(
+        ("human_readable", "payload_value", "expected_value"),
+        [(True, 1, "flow"), (False, 1, 1)],
+    )
+    async def test_get_status(self, human_readable: bool, payload_value: int, expected_value: int | str) -> None:
         """Test get status for heat pump."""
         with aioresponses() as mock_keenergy_api:
             mock_keenergy_api.post(
                 "http://mocked-host/var/readWriteVars",
-                payload=[{"name": "APPL.CtrlAppl.sParam.heatpump[0].values.heatpumpState", "value": "0"}],
+                payload=[
+                    {"name": "APPL.CtrlAppl.sParam.heatpump[0].values.heatpumpState", "value": f"{payload_value}"}
+                ],
                 headers={"Content-Type": "application/json;charset=utf-8"},
             )
 
             client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
-            data: int = await client.heat_pump.get_status()
+            data: int | str = await client.heat_pump.get_status(human_readable=human_readable)
 
-            assert isinstance(data, int)
-            assert data == 0
+            assert isinstance(data, (int | str))
+            assert data == expected_value
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
@@ -809,6 +853,29 @@ class TestHeatPumpSection:
 
 class TestHeatCircuitSection:
     @pytest.mark.asyncio()
+    async def test_get_name(self) -> None:
+        """Test get name for heat circuit."""
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/var/readWriteVars",
+                payload=[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.name", "value": "FBH"}],
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
+
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+            data: str = await client.heat_circuit.get_name()
+
+            assert isinstance(data, str)
+            assert data == "FBH"
+
+            mock_keenergy_api.assert_called_once_with(
+                url="http://mocked-host/var/readWriteVars",
+                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.name"}]',
+                method="POST",
+                ssl=False,
+            )
+
+    @pytest.mark.asyncio()
     async def test_get_temperature(self) -> None:
         """Test get temperature for heat circuit."""
         with aioresponses() as mock_keenergy_api:
@@ -1030,20 +1097,28 @@ class TestHeatCircuitSection:
             )
 
     @pytest.mark.asyncio()
-    async def test_get_operating_mode(self) -> None:
+    @pytest.mark.parametrize(
+        ("human_readable", "payload_value", "expected_value"),
+        [(True, 3, "night"), (False, 3, 3)],
+    )
+    async def test_get_operating_mode(
+        self, human_readable: bool, payload_value: int, expected_value: int | str
+    ) -> None:
         """Test get operating mode for heat circuit."""
         with aioresponses() as mock_keenergy_api:
             mock_keenergy_api.post(
                 "http://mocked-host/var/readWriteVars",
-                payload=[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.operatingMode", "value": "3"}],
+                payload=[
+                    {"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.operatingMode", "value": f"{payload_value}"}
+                ],
                 headers={"Content-Type": "application/json;charset=utf-8"},
             )
 
             client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
-            data: int | None = await client.heat_circuit.get_operating_mode()
+            data: int | str | None = await client.heat_circuit.get_operating_mode(human_readable=human_readable)
 
-            assert isinstance(data, int)
-            assert data == HeatCircuitOperatingMode.NIGHT
+            assert isinstance(data, (int | str))
+            assert data == expected_value
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
@@ -1056,8 +1131,8 @@ class TestHeatCircuitSection:
     @pytest.mark.parametrize(
         ("operating_mode", "expected_value"),
         [
-            (HeatCircuitOperatingMode.OFF, 0),
-            (HeatCircuitOperatingMode.AUTO, 1),
+            ("OFF", 0),
+            ("AUTO", 1),
             (HeatCircuitOperatingMode.DAY, 2),
             (HeatCircuitOperatingMode.NIGHT, 3),
         ],
@@ -1085,3 +1160,32 @@ class TestHeatCircuitSection:
                 method="POST",
                 ssl=False,
             )
+
+    @pytest.mark.asyncio()
+    @pytest.mark.parametrize(
+        ("operating_mode", "expected_value"),
+        [
+            ("INVALID", 0),
+        ],
+    )
+    async def test_set_invalid_operating_mode(
+        self,
+        operating_mode: int,
+        expected_value: int,
+    ) -> None:
+        """Test set operating mode heat circuit."""
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/var/readWriteVars?action=set",
+                payload={},
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
+
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+
+            with pytest.raises(APIError) as error:
+                await client.heat_circuit.set_operating_mode(operating_mode)
+
+            assert str(error.value) == "Invalid operating mode!"
+
+            mock_keenergy_api.assert_not_called()

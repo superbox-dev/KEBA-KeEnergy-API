@@ -1,5 +1,6 @@
 """All API Constants."""
 from enum import Enum
+from enum import IntEnum
 from typing import Final
 from typing import NamedTuple
 from typing import TypeAlias
@@ -14,18 +15,18 @@ class Endpoint:
     SYSTEM_INFO: Final[str] = "/swupdate?action=getSystemInstalled"
 
 
-class HotWaterTankOperatingMode:
+class HotWaterTankOperatingMode(IntEnum):
     OFF: Final[int] = 0
     HEAT_UP: Final[int] = 3
 
 
-class HeatPumpStatus:
+class HeatPumpStatus(IntEnum):
     STANDBY: Final[int] = 0
     FLOW: Final[int] = 1
     AUTO: Final[int] = 2
 
 
-class HeatCircuitOperatingMode:
+class HeatCircuitOperatingMode(IntEnum):
     OFF: Final[int] = 0
     AUTO: Final[int] = 1
     DAY: Final[int] = 2
@@ -90,6 +91,7 @@ class HeatPump(Enum):
 
 
 class HeatCircuit(Enum):
+    NAME: Final[ControlValue] = ControlValue("param.name", str, read_only=True)
     TEMPERATURE: Final[ControlValue] = ControlValue("values.setValue", float, read_only=True)
     DAY_TEMPERATURE: Final[ControlValue] = ControlValue("param.normalSetTemp", float, read_only=False)
     DAY_TEMPERATURE_THRESHOLD: Final[ControlValue] = ControlValue("param.thresholdDayTemp.value", float, read_only=True)
@@ -104,4 +106,4 @@ class HeatCircuit(Enum):
     OPERATING_MODE: Final[ControlValue] = ControlValue("param.operatingMode", int, read_only=False)
 
 
-Control: TypeAlias = Outdoor | Options | HotWaterTank | HeatPump | HeatCircuit
+Control: TypeAlias = Options | Outdoor | HotWaterTank | HeatPump | HeatCircuit

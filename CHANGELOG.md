@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added `get_name()` to **heat pump** to read the model name.
+- Added `heat_pump.get_name()` to read the **heat pump** name.
+- Added `heat_circuit.get_name()` to read the **heat circuit** name.
 
 ## [1.5.0] - 2023-10-13
 
