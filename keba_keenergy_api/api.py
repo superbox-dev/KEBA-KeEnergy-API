@@ -20,17 +20,43 @@ class KebaKeEnergyAPI(BaseSection):
 
     def __init__(self, host: str, *, ssl: bool = False, session: ClientSession | None = None) -> None:
         """Initialize with Client Session and host."""
-        schema: str = "https" if ssl else "http"
-        base_url: str = f"{schema}://{host}"
+        self.host: str = host
+        self.schema: str = "https" if ssl else "http"
 
-        self.device_url: str = base_url
-        self.device: DeviceSection = DeviceSection(base_url=base_url, ssl=ssl, session=session)
-        self.options: OptionsSection = OptionsSection(base_url=base_url, ssl=ssl, session=session)
-        self.hot_water_tank: HotWaterTankSection = HotWaterTankSection(base_url, ssl=ssl, session=session)
-        self.heat_pump: HeatPumpSection = HeatPumpSection(base_url=base_url, ssl=ssl, session=session)
-        self.heat_circuit: HeatCircuitSection = HeatCircuitSection(base_url=base_url, ssl=ssl, session=session)
+        self.ssl: bool = ssl
+        self.session: ClientSession | None = session
 
         super().__init__(base_url=self.device_url, ssl=ssl, session=session)
+
+    @property
+    def device_url(self) -> str:
+        """Get device url."""
+        return f"{self.schema}://{self.host}"
+
+    @property
+    def device(self) -> DeviceSection:
+        """Get device endpoints."""
+        return DeviceSection(base_url=self.device_url, ssl=self.ssl, session=self.session)
+
+    @property
+    def options(self) -> OptionsSection:
+        """Get options endpoints."""
+        return OptionsSection(base_url=self.device_url, ssl=self.ssl, session=self.session)
+
+    @property
+    def hot_water_tank(self) -> HotWaterTankSection:
+        """Get hot water tank endpoints."""
+        return HotWaterTankSection(base_url=self.device_url, ssl=self.ssl, session=self.session)
+
+    @property
+    def heat_pump(self) -> HeatPumpSection:
+        """Get heat pump endpoints."""
+        return HeatPumpSection(base_url=self.device_url, ssl=self.ssl, session=self.session)
+
+    @property
+    def heat_circuit(self) -> HeatCircuitSection:
+        """Get heat circuit endpoints."""
+        return HeatCircuitSection(base_url=self.device_url, ssl=self.ssl, session=self.session)
 
     async def read_values(
         self,
