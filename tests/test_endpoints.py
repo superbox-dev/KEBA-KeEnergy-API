@@ -239,9 +239,9 @@ class TestOptionSection:
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
                 data=(
-                    '[{"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatPumps"}, '
-                    '{"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatingCircuits"}, '
-                    '{"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHotWaterTanks"}]'
+                    '[{"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatPumps", "attr": "0"}, '
+                    '{"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatingCircuits", "attr": "0"}, '
+                    '{"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHotWaterTanks", "attr": "0"}]'
                 ),
                 method="POST",
                 ssl=False,
@@ -270,7 +270,7 @@ class TestOptionSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHotWaterTanks"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHotWaterTanks", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -298,7 +298,7 @@ class TestOptionSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatPumps"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatPumps", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -326,7 +326,7 @@ class TestOptionSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatingCircuits"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatingCircuits", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -356,7 +356,7 @@ class TestHotWaterTankSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].topTemp.values.actValue"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].topTemp.values.actValue", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -393,7 +393,7 @@ class TestHotWaterTankSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.operatingMode"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.operatingMode", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -454,6 +454,78 @@ class TestHotWaterTankSection:
             mock_keenergy_api.assert_not_called()
 
     @pytest.mark.asyncio()
+    async def test_get_lower_limit_temperature(self) -> None:
+        """Test get lower limit temperature for hot water tank."""
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/var/readWriteVars",
+                payload=[
+                    {
+                        "name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.normalSetTempMax.value",
+                        "attributes": {
+                            "dynUpperLimit": 1,
+                            "formatId": "fmtTemp",
+                            "longText": "Temp. nom.",
+                            "lowerLimit": "0",
+                            "unitId": "Temp",
+                            "upperLimit": "52",
+                        },
+                        "value": "50",
+                    },
+                ],
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
+
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+            data: int = await client.hot_water_tank.get_lower_limit_temperature()
+
+            assert isinstance(data, int)
+            assert data == 0
+
+            mock_keenergy_api.assert_called_once_with(
+                url="http://mocked-host/var/readWriteVars",
+                data='[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.normalSetTempMax.value", "attr": "1"}]',
+                method="POST",
+                ssl=False,
+            )
+
+    @pytest.mark.asyncio()
+    async def test_get_upper_limit_temperature(self) -> None:
+        """Test get upper limit temperature for hot water tank."""
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/var/readWriteVars",
+                payload=[
+                    {
+                        "name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.normalSetTempMax.value",
+                        "attributes": {
+                            "dynUpperLimit": 1,
+                            "formatId": "fmtTemp",
+                            "longText": "Temp. nom.",
+                            "lowerLimit": "0",
+                            "unitId": "Temp",
+                            "upperLimit": "52",
+                        },
+                        "value": "50",
+                    },
+                ],
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
+
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+            data: int = await client.hot_water_tank.get_upper_limit_temperature()
+
+            assert isinstance(data, int)
+            assert data == 52  # noqa: PLR2004
+
+            mock_keenergy_api.assert_called_once_with(
+                url="http://mocked-host/var/readWriteVars",
+                data='[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.normalSetTempMax.value", "attr": "1"}]',
+                method="POST",
+                ssl=False,
+            )
+
+    @pytest.mark.asyncio()
     async def test_get_min_temperature(self) -> None:
         """Test get minimum temperature for hot water tank."""
         with aioresponses() as mock_keenergy_api:
@@ -471,7 +543,7 @@ class TestHotWaterTankSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.reducedSetTempMax.value"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.reducedSetTempMax.value", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -514,7 +586,7 @@ class TestHotWaterTankSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.normalSetTempMax.value"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.normalSetTempMax.value", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -559,7 +631,7 @@ class TestHeatPumpSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].param.name"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].param.name", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -596,7 +668,7 @@ class TestHeatPumpSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].values.heatpumpState"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].values.heatpumpState", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -619,7 +691,7 @@ class TestHeatPumpSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].CircPump.values.setValueScaled"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].CircPump.values.setValueScaled", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -647,7 +719,7 @@ class TestHeatPumpSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatFlow.values.actValue"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatFlow.values.actValue", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -675,7 +747,7 @@ class TestHeatPumpSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatReflux.values.actValue"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatReflux.values.actValue", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -703,7 +775,7 @@ class TestHeatPumpSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempSourceIn.values.actValue"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempSourceIn.values.actValue", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -726,7 +798,7 @@ class TestHeatPumpSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempSourceOut.values.actValue"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempSourceOut.values.actValue", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -754,7 +826,7 @@ class TestHeatPumpSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempCompressorIn.values.actValue"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempCompressorIn.values.actValue", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -782,7 +854,7 @@ class TestHeatPumpSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempCompressorOut.values.actValue"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempCompressorOut.values.actValue", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -805,7 +877,7 @@ class TestHeatPumpSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].Compressor.values.setValueScaled"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].Compressor.values.setValueScaled", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -833,7 +905,7 @@ class TestHeatPumpSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].HighPressure.values.actValue"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].HighPressure.values.actValue", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -856,7 +928,7 @@ class TestHeatPumpSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].LowPressure.values.actValue"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].LowPressure.values.actValue", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -881,7 +953,7 @@ class TestHeatCircuitSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.name"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.name", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -904,7 +976,7 @@ class TestHeatCircuitSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -927,7 +999,7 @@ class TestHeatCircuitSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.normalSetTemp"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.normalSetTemp", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -970,7 +1042,7 @@ class TestHeatCircuitSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.thresholdDayTemp.value"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.thresholdDayTemp.value", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -993,7 +1065,7 @@ class TestHeatCircuitSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.reducedSetTemp"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.reducedSetTemp", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -1036,7 +1108,7 @@ class TestHeatCircuitSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.thresholdNightTemp.value"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.thresholdNightTemp.value", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -1059,7 +1131,7 @@ class TestHeatCircuitSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.holidaySetTemp"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.holidaySetTemp", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -1082,7 +1154,7 @@ class TestHeatCircuitSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.offsetRoomTemp"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.offsetRoomTemp", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -1139,7 +1211,7 @@ class TestHeatCircuitSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.operatingMode"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.operatingMode", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )

@@ -41,7 +41,7 @@ class WritePayload(TypedDict):
     value: str
 
 
-ValueResponse: TypeAlias = dict[str, tuple[float | int | str | dict[str, Any], ...]]
+ValueResponse: TypeAlias = dict[str, tuple[Any, ...]]
 Payload: TypeAlias = list[ReadPayload | WritePayload]
 Response: TypeAlias = list[dict[str, str]]
 

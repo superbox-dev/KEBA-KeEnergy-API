@@ -34,7 +34,7 @@ class TestKebaKeEnergyAPI:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -61,7 +61,7 @@ class TestKebaKeEnergyAPI:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue", "attr": "0"}]',
                 method="POST",
                 ssl=False,
             )
@@ -84,7 +84,7 @@ class TestKebaKeEnergyAPI:
                 [
                     {"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue", "value": "10.808357"},
                 ],
-                '[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue"}]',
+                '[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue", "attr": "0"}]',
                 {
                     "HEAT_CIRCUIT_TEMPERATURE": (10.81,),
                 },
@@ -100,10 +100,10 @@ class TestKebaKeEnergyAPI:
                     {"name": "APPL.CtrlAppl.sParam.heatpump[2].TempHeatFlow.values.actValue", "value": "23.200001"},
                 ],
                 (
-                    '[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue"}, '
-                    '{"name": "APPL.CtrlAppl.sParam.heatCircuit[2].values.setValue"}, '
-                    '{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatFlow.values.actValue"}, '
-                    '{"name": "APPL.CtrlAppl.sParam.heatpump[2].TempHeatFlow.values.actValue"}]'
+                    '[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue", "attr": "0"}, '
+                    '{"name": "APPL.CtrlAppl.sParam.heatCircuit[2].values.setValue", "attr": "0"}, '
+                    '{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatFlow.values.actValue", "attr": "0"}, '
+                    '{"name": "APPL.CtrlAppl.sParam.heatpump[2].TempHeatFlow.values.actValue", "attr": "0"}]'
                 ),
                 {
                     "HEAT_CIRCUIT_TEMPERATURE": (10.81, 11.81),
@@ -125,10 +125,10 @@ class TestKebaKeEnergyAPI:
                     {"name": "APPL.CtrlAppl.sParam.heatpump[1].TempHeatFlow.values.actValue", "value": "23.200001"},
                 ],
                 (
-                    '[{"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue"}, '
-                    '{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue"}, '
-                    '{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatFlow.values.actValue"}, '
-                    '{"name": "APPL.CtrlAppl.sParam.heatpump[1].TempHeatFlow.values.actValue"}]'
+                    '[{"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue", "attr": "0"}, '
+                    '{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue", "attr": "0"}, '
+                    '{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatFlow.values.actValue", "attr": "0"}, '
+                    '{"name": "APPL.CtrlAppl.sParam.heatpump[1].TempHeatFlow.values.actValue", "attr": "0"}]'
                 ),
                 {
                     "OUTDOOR_TEMPERATURE": (17.54,),
