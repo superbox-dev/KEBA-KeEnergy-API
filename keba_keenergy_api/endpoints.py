@@ -33,6 +33,7 @@ if TYPE_CHECKING:
 
 class ReadPayload(TypedDict):
     name: str
+    attr: str
 
 
 class WritePayload(TypedDict):
@@ -40,7 +41,7 @@ class WritePayload(TypedDict):
     value: str
 
 
-ValueResponse: TypeAlias = dict[str, tuple[float | int | str, ...]]
+ValueResponse: TypeAlias = dict[str, tuple[float | int | str | dict[str, Any], ...]]
 Payload: TypeAlias = list[ReadPayload | WritePayload]
 Response: TypeAlias = list[dict[str, str]]
 
@@ -134,6 +135,8 @@ class BaseSection:
         request: list[Control],
         position: Position | list[int | None],
         allowed_type: list[type[Enum]] | None,
+        *,
+        extra_attributes: bool = False,
     ) -> Payload:
         payload: Payload = []
 
@@ -143,6 +146,7 @@ class BaseSection:
                     payload += [
                         ReadPayload(
                             name=f"{self._get_key_prefix(control)}{self._get_position(idx)}.{control.value.value}",
+                            attr=str(int(extra_attributes is True)),
                         ),
                     ]
 
@@ -156,6 +160,7 @@ class BaseSection:
         *,
         key_prefix: bool = True,
         human_readable: bool = True,
+        extra_attributes: bool = False,
     ) -> ValueResponse:
         if isinstance(request, Options | Outdoor | HotWaterTank | HeatPump | HeatCircuit):
             request = [request]
@@ -170,6 +175,7 @@ class BaseSection:
             request=request,
             position=position,
             allowed_type=allowed_type,
+            extra_attributes=extra_attributes,
         )
 
         _response: list[dict[str, Any]] = await self._post(
@@ -177,7 +183,7 @@ class BaseSection:
             endpoint=Endpoint.READ_VALUES,
         )
 
-        response: dict[str, list[float | int | str]] = {}
+        response: dict[str, list[float | int | str | dict[str, Any]]] = {}
 
         for control in request:
             if (allowed_type and type(control) in allowed_type) or not allowed_type:
@@ -187,15 +193,19 @@ class BaseSection:
                     if not response.get(response_key):
                         response[response_key] = []
 
-                    value: float | int | str = control.value.data_type(_response[0]["value"])
-                    value = round(value, 2) if isinstance(value, float) else value
-                    value = (
-                        control.value.human_readable(value).name.lower()
-                        if (human_readable and control.value.human_readable)
-                        else value
-                    )
+                    if extra_attributes:
+                        attr: dict[str, Any] = _response[0]["attributes"]
+                        response[response_key].append(attr)
+                    else:
+                        value: float | int | str = control.value.data_type(_response[0]["value"])
+                        value = round(value, 2) if isinstance(value, float) else value
+                        value = (
+                            control.value.human_readable(value).name.lower()
+                            if (human_readable and control.value.human_readable)
+                            else value
+                        )
+                        response[response_key].append(value)
 
-                    response[response_key].append(value)
                     del _response[0]
 
         return {k: tuple(v) for k, v in response.items()}
@@ -368,6 +378,28 @@ class HotWaterTankSection(BaseSection):
         modes: list[int | None] = [_mode if position == p else None for p in range(1, position + 1)]
 
         await self._write_values(request={HotWaterTank.OPERATING_MODE: tuple(modes)})
+
+    async def get_lower_limit_temperature(self, position: int | None = 1) -> int:
+        """Get lower limit temperature."""
+        response: ValueResponse = await self._read_values(
+            request=HotWaterTank.MAX_TEMPERATURE,
+            position=position,
+            extra_attributes=True,
+        )
+        _idx: int = position - 1 if position else 0
+        _key: str = self._get_real_key(HotWaterTank.MAX_TEMPERATURE)
+        return int(response[_key][_idx]["lowerLimit"])
+
+    async def get_upper_limit_temperature(self, position: int | None = 1) -> int:
+        """Get uper limit temperature."""
+        response: ValueResponse = await self._read_values(
+            request=HotWaterTank.MAX_TEMPERATURE,
+            position=position,
+            extra_attributes=True,
+        )
+        _idx: int = position - 1 if position else 0
+        _key: str = self._get_real_key(HotWaterTank.MAX_TEMPERATURE)
+        return int(response[_key][_idx]["upperLimit"])
 
     async def get_min_temperature(self, position: int | None = 1) -> float:
         """Get minimum temperature."""

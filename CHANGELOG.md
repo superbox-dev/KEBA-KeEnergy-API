@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.0] - 2023-10-19
+
+### Added
+
+- Added `hot_water_tank.get_lower_limit_temperature()` endpoint.
+- Added `hot_water_tank.get_upper_limit_temperature()` endpoint.
+
 ## [1.6.2] - 2023-10-18
 
 ### Fixed

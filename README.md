@@ -24,7 +24,6 @@ import asyncio
 from typing import Any
 
 from keba_keenergy_api import KebaKeEnergyAPI
-from keba_keenergy_api.constants import HeatCircuitOperatingMode
 from keba_keenergy_api.constants import HeatCircuit
 
 
@@ -67,7 +66,6 @@ By default, the library creates a new connection to `KEBA KeEnergy API` with eac
 import asyncio
 
 from keba_keenergy_api import KebaKeEnergyAPI
-from keba_keenergy_api.constants import HeatCircuitOperatingMode
 
 from aiohttp import ClientSession
 
@@ -102,6 +100,8 @@ asyncio.run(main())
 
 | Endpoint                                           | Request/Response | Description                                                                          |
 |----------------------------------------------------|------------------|--------------------------------------------------------------------------------------|
+| `.get_lower_limit_temperature(position)`           | `int`            | Get lower limit temperature.                                                         |
+| `.get_upper_limit_temperature(position)`           | `int`            | Get upper limit temperature.                                                         |
 | `.get_temperature(position)`                       | `float`          | Get temperature.                                                                     |
 | `.get_operating_mode(position, human_readable)`    | `int` or `str`   | Get operating mode as integer (0 is `OFF`, 1 is `AUTO`, 2 is `DAY` and 3 is `NIGHT`. |
 | `.set_operating_mode(0, position, human_readable)` | `int` or `str`   | Set operating mode.                                                                  |
