@@ -1,5 +1,4 @@
 """Client to interact with KEBA KeEnergy API."""
-import asyncio
 from typing import Any
 
 from aiohttp import ClientSession
@@ -85,13 +84,3 @@ class KebaKeEnergyAPI(BaseSection):
         response: dict[str, Any] = await self._read_values(request=Outdoor.TEMPERATURE, position=None)
         _key: str = self._get_real_key(Outdoor.TEMPERATURE)
         return float(response[_key][0])
-
-
-async def main():
-    client = KebaKeEnergyAPI(host="hc.superbox.one", ssl=True)
-    data: float = await client.hot_water_tank.get_upper_limit_temperature()
-    print(data)
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
