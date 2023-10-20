@@ -698,7 +698,7 @@ class TestKebaKeEnergyAPI:
         option_payload: list[dict[str, str]] | None,
         payload: list[dict[str, str]],
         expected_data: str,
-        expected_response: ValueResponse,
+        expected_response: dict[str, ValueResponse],
     ) -> None:
         """Test read multiple values."""
         with aioresponses() as mock_keenergy_api:
