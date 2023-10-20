@@ -717,7 +717,8 @@ class TestKebaKeEnergyAPI:
 
             client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
             response: dict[str, ValueResponse] = await client.read_values_grouped_by_section(
-                request=control, position=position,
+                request=control,
+                position=position,
             )
 
             assert isinstance(response, dict)
