@@ -5,6 +5,7 @@ from aiohttp import ClientSession
 
 from keba_keenergy_api.constants import Control
 from keba_keenergy_api.constants import Outdoor
+from keba_keenergy_api.constants import SystemPrefix
 from keba_keenergy_api.endpoints import BaseSection
 from keba_keenergy_api.endpoints import DeviceSection
 from keba_keenergy_api.endpoints import HeatCircuitSection
@@ -64,6 +65,7 @@ class KebaKeEnergyAPI(BaseSection):
         position: Position | int | list[int | None] | None = None,
         *,
         human_readable: bool = True,
+        extra_attributes: bool = True,
     ) -> ValueResponse:
         """Read multiple values from API with one request."""
         if position is None:
@@ -73,7 +75,46 @@ class KebaKeEnergyAPI(BaseSection):
             request=request,
             position=position,
             human_readable=human_readable,
+            extra_attributes=extra_attributes,
         )
+
+    async def read_values_grouped_by_section(
+        self,
+        request: Control | list[Control],
+        position: Position | int | list[int | None] | None = None,
+        *,
+        human_readable: bool = True,
+        extra_attributes: bool = True,
+    ) -> dict[str, ValueResponse]:
+        """Read multiple grouped values from API with one request."""
+        response: ValueResponse = await self.read_values(
+            request=request,
+            position=position,
+            human_readable=human_readable,
+            extra_attributes=extra_attributes,
+        )
+
+        data: dict[str, ValueResponse] = {
+            SystemPrefix.OUTDOOR[0:-1]: {},
+            SystemPrefix.OPTIONS[0:-1]: {},
+            SystemPrefix.HOT_WATER_TANK[0:-1]: {},
+            SystemPrefix.HEAT_PUMP[0:-1]: {},
+            SystemPrefix.HEAT_CIRCUIT[0:-1]: {},
+        }
+
+        for key, value in response.items():
+            if key.startswith(SystemPrefix.OUTDOOR):
+                data[SystemPrefix.OUTDOOR[0:-1]][key.lower()] = value
+            elif key.startswith(SystemPrefix.OPTIONS):
+                data[SystemPrefix.OPTIONS[0:-1]][key.lower()] = value
+            elif key.startswith(SystemPrefix.HOT_WATER_TANK):
+                data[SystemPrefix.HOT_WATER_TANK[0:-1]][key.lower()] = value
+            elif key.startswith(SystemPrefix.HEAT_PUMP):
+                data[SystemPrefix.HEAT_PUMP[0:-1]][key.lower()] = value
+            elif key.startswith(SystemPrefix.HEAT_CIRCUIT):
+                data[SystemPrefix.HEAT_CIRCUIT[0:-1]][key.lower()] = value
+
+        return data
 
     async def write_values(self, request: dict[Control, tuple[float | int | None, ...]]) -> None:
         """Write multiple values to API with one request."""
@@ -81,6 +122,10 @@ class KebaKeEnergyAPI(BaseSection):
 
     async def get_outdoor_temperature(self) -> float:
         """Get outdoor temperature."""
-        response: dict[str, Any] = await self._read_values(request=Outdoor.TEMPERATURE, position=None)
+        response: dict[str, Any] = await self._read_values(
+            request=Outdoor.TEMPERATURE,
+            position=None,
+            extra_attributes=True,
+        )
         _key: str = self._get_real_key(Outdoor.TEMPERATURE)
-        return float(response[_key][0])
+        return float(response[_key][0]["value"])

@@ -41,15 +41,20 @@ class WritePayload(TypedDict):
     value: str
 
 
-ValueResponse: TypeAlias = dict[str, tuple[Any, ...]]
-Payload: TypeAlias = list[ReadPayload | WritePayload]
-Response: TypeAlias = list[dict[str, str]]
-
-
 class Position(NamedTuple):
     heat_pump: int
     heat_circuit: int
     hot_water_tank: int
+
+
+class Value(TypedDict, total=False):
+    value: str | float | int
+    attributes: dict[str, Any]
+
+
+ValueResponse: TypeAlias = dict[str, list[Value]]
+Payload: TypeAlias = list[ReadPayload | WritePayload]
+Response: TypeAlias = list[dict[str, str]]
 
 
 class BaseSection:
@@ -121,7 +126,9 @@ class BaseSection:
     def _get_position_index(self, control: Control, position: Position | list[int | None]) -> list[int | None]:
         idx: list[int | None] = []
 
-        if isinstance(position, Position):
+        if isinstance(control, Options):
+            idx = [None]
+        elif isinstance(position, Position):
             position_key: str = f"{self.KEY_PATTERN.sub('_', control.__class__.__name__).lower()}"
             _position: int | None = getattr(position, position_key, None)
             idx = list(range(_position)) if _position else [None]
@@ -151,6 +158,26 @@ class BaseSection:
                     ]
 
         return payload
+
+    @staticmethod
+    def _convert_value(control: Control, response: list[dict[str, Any]], *, human_readable: bool) -> float | int | str:
+        value: float | int | str = control.value.data_type(response[0]["value"])
+        value = round(value, 2) if isinstance(value, float) else value
+        return (
+            control.value.human_readable(value).name.lower()
+            if (human_readable and control.value.human_readable)
+            else value
+        )
+
+    @staticmethod
+    def _clean_attributes(response: list[dict[str, Any]]) -> dict[str, Any]:
+        attributes: dict[str, Any] = response[0].get("attributes", {})
+
+        for attr_key in ["longText", "formatId", "dynLowerLimit", "dynUpperLimit"]:
+            if attributes.get(attr_key):
+                del attributes[attr_key]
+
+        return attributes
 
     async def _read_values(
         self,
@@ -183,7 +210,7 @@ class BaseSection:
             endpoint=Endpoint.READ_VALUES,
         )
 
-        response: dict[str, list[float | int | str | dict[str, Any]]] = {}
+        response: dict[str, list[Value]] = {}
 
         for control in request:
             if (allowed_type and type(control) in allowed_type) or not allowed_type:
@@ -193,22 +220,19 @@ class BaseSection:
                     if not response.get(response_key):
                         response[response_key] = []
 
-                    if extra_attributes:
-                        attr: dict[str, Any] = _response[0]["attributes"]
-                        response[response_key].append(attr)
-                    else:
-                        value: float | int | str = control.value.data_type(_response[0]["value"])
-                        value = round(value, 2) if isinstance(value, float) else value
-                        value = (
-                            control.value.human_readable(value).name.lower()
-                            if (human_readable and control.value.human_readable)
-                            else value
-                        )
-                        response[response_key].append(value)
+                    _value: Value = {
+                        "value": self._convert_value(
+                            control,
+                            response=_response,
+                            human_readable=human_readable,
+                        ),
+                        "attributes": self._clean_attributes(response=_response),
+                    }
 
+                    response[response_key].append(_value)
                     del _response[0]
 
-        return {k: tuple(v) for k, v in response.items()}
+        return response
 
     def _generate_write_payload(self, request: dict[Control, tuple[float | int | None, ...]]) -> Payload:
         payload: Payload = []
@@ -290,18 +314,16 @@ class OptionsSection(BaseSection):
             ],
         )
 
-        return Position(**{k.replace("_NUMBERS", "").lower(): int(v[0]) for k, v in data.items()})
+        return Position(**{k.replace("_NUMBERS", "").lower(): int(v[0]["value"]) for k, v in data.items()})
 
-    async def read_values(
-        self,
-        request: Control | list[Control],
-    ) -> ValueResponse:
+    async def read_values(self, request: Control | list[Control], *, extra_attributes: bool = True) -> ValueResponse:
         """Read multiple option values from API with one request."""
         _values: ValueResponse = await self._read_values(
             request=request,
             position=None,
             key_prefix=False,
             allowed_type=Options,
+            extra_attributes=extra_attributes,
         )
 
         return _values
@@ -311,27 +333,30 @@ class OptionsSection(BaseSection):
         response: ValueResponse = await self._read_values(
             request=Options.HOT_WATER_TANK_NUMBERS,
             position=None,
+            extra_attributes=True,
         )
         _key: str = self._get_real_key(Options.HOT_WATER_TANK_NUMBERS)
-        return int(response[_key][0])
+        return int(response[_key][0]["value"])
 
     async def get_number_of_heat_pumps(self) -> int:
         """Get number of heat pumps."""
         response: ValueResponse = await self._read_values(
             request=Options.HEAT_PUMP_NUMBERS,
             position=None,
+            extra_attributes=True,
         )
         _key: str = self._get_real_key(Options.HEAT_PUMP_NUMBERS)
-        return int(response[_key][0])
+        return int(response[_key][0]["value"])
 
     async def get_number_of_heating_circuits(self) -> int:
         """Get number of heating circuits."""
         response: ValueResponse = await self._read_values(
             request=Options.HEAT_CIRCUIT_NUMBERS,
             position=None,
+            extra_attributes=True,
         )
         _key: str = self._get_real_key(Options.HEAT_CIRCUIT_NUMBERS)
-        return int(response[_key][0])
+        return int(response[_key][0]["value"])
 
 
 class HotWaterTankSection(BaseSection):
@@ -345,10 +370,11 @@ class HotWaterTankSection(BaseSection):
         response: ValueResponse = await self._read_values(
             request=HotWaterTank.TEMPERATURE,
             position=position,
+            extra_attributes=True,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HotWaterTank.TEMPERATURE)
-        return float(response[_key][_idx])
+        return float(response[_key][_idx]["value"])
 
     async def get_operating_mode(self, position: int | None = 1, *, human_readable: bool = True) -> int | str:
         """Get operating mode."""
@@ -356,14 +382,15 @@ class HotWaterTankSection(BaseSection):
             request=HotWaterTank.OPERATING_MODE,
             position=position,
             human_readable=human_readable,
+            extra_attributes=True,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HotWaterTank.OPERATING_MODE)
 
         try:
-            _value: int | str = int(response[_key][_idx])
+            _value: int | str = int(response[_key][_idx]["value"])
         except ValueError:
-            _value = str(response[_key][_idx])
+            _value = str(response[_key][_idx]["value"])
 
         return _value
 
@@ -388,7 +415,7 @@ class HotWaterTankSection(BaseSection):
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HotWaterTank.MAX_TEMPERATURE)
-        return int(response[_key][_idx]["lowerLimit"])
+        return int(response[_key][_idx]["attributes"]["lowerLimit"])
 
     async def get_upper_limit_temperature(self, position: int | None = 1) -> int:
         """Get uper limit temperature."""
@@ -399,17 +426,18 @@ class HotWaterTankSection(BaseSection):
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HotWaterTank.MAX_TEMPERATURE)
-        return int(response[_key][_idx]["upperLimit"])
+        return int(response[_key][_idx]["attributes"]["upperLimit"])
 
     async def get_min_temperature(self, position: int | None = 1) -> float:
         """Get minimum temperature."""
         response: ValueResponse = await self._read_values(
             request=HotWaterTank.MIN_TEMPERATURE,
             position=position,
+            extra_attributes=True,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HotWaterTank.MIN_TEMPERATURE)
-        return float(response[_key][_idx])
+        return float(response[_key][_idx]["value"])
 
     async def set_min_temperature(self, temperature: int, position: int = 1) -> None:
         """Set minimum temperature."""
@@ -421,10 +449,11 @@ class HotWaterTankSection(BaseSection):
         response: ValueResponse = await self._read_values(
             request=HotWaterTank.MAX_TEMPERATURE,
             position=position,
+            extra_attributes=True,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HotWaterTank.MAX_TEMPERATURE)
-        return float(response[_key][_idx])
+        return float(response[_key][_idx]["value"])
 
     async def set_max_temperature(self, temperature: int, position: int = 1) -> None:
         """Set maximum temperature."""
@@ -443,10 +472,11 @@ class HeatPumpSection(BaseSection):
         response: ValueResponse = await self._read_values(
             request=HeatPump.NAME,
             position=position,
+            extra_attributes=True,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HeatPump.NAME)
-        return str(response[_key][_idx])
+        return str(response[_key][_idx]["value"])
 
     async def get_status(self, position: int | None = 1, *, human_readable: bool = True) -> int | str:
         """Get status."""
@@ -454,14 +484,15 @@ class HeatPumpSection(BaseSection):
             request=HeatPump.STATUS,
             position=position,
             human_readable=human_readable,
+            extra_attributes=True,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HeatPump.STATUS)
 
         try:
-            _value: int | str = int(response[_key][_idx])
+            _value: int | str = int(response[_key][_idx]["value"])
         except ValueError:
-            _value = str(response[_key][_idx])
+            _value = str(response[_key][_idx]["value"])
 
         return _value
 
@@ -470,100 +501,110 @@ class HeatPumpSection(BaseSection):
         response: ValueResponse = await self._read_values(
             request=HeatPump.CIRCULATION_PUMP,
             position=position,
+            extra_attributes=True,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HeatPump.CIRCULATION_PUMP)
-        return float(response[_key][_idx])
+        return float(response[_key][_idx]["value"])
 
     async def get_inflow_temperature(self, position: int | None = 1) -> float:
         """Get inflow temperature."""
         response: ValueResponse = await self._read_values(
             request=HeatPump.INFLOW_TEMPERATURE,
             position=position,
+            extra_attributes=True,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HeatPump.INFLOW_TEMPERATURE)
-        return float(response[_key][_idx])
+        return float(response[_key][_idx]["value"])
 
     async def get_reflux_temperature(self, position: int | None = 1) -> float:
         """Get reflux temperature."""
         response: ValueResponse = await self._read_values(
             request=HeatPump.REFLUX_TEMPERATURE,
             position=position,
+            extra_attributes=True,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HeatPump.REFLUX_TEMPERATURE)
-        return float(response[_key][_idx])
+        return float(response[_key][_idx]["value"])
 
     async def get_source_input_temperature(self, position: int | None = 1) -> float:
         """Get source input temperature."""
         response: ValueResponse = await self._read_values(
             request=HeatPump.SOURCE_INPUT_TEMPERATURE,
             position=position,
+            extra_attributes=True,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HeatPump.SOURCE_INPUT_TEMPERATURE)
-        return float(response[_key][_idx])
+        return float(response[_key][_idx]["value"])
 
     async def get_source_output_temperature(self, position: int | None = 1) -> float:
         """Get source output temperature."""
         response: ValueResponse = await self._read_values(
             request=HeatPump.SOURCE_OUTPUT_TEMPERATURE,
             position=position,
+            extra_attributes=True,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HeatPump.SOURCE_OUTPUT_TEMPERATURE)
-        return float(response[_key][_idx])
+        return float(response[_key][_idx]["value"])
 
     async def get_compressor_input_temperature(self, position: int | None = 1) -> float:
         """Get compressor input temperature."""
         response: ValueResponse = await self._read_values(
             request=HeatPump.COMPRESSOR_INPUT_TEMPERATURE,
             position=position,
+            extra_attributes=True,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HeatPump.COMPRESSOR_INPUT_TEMPERATURE)
-        return float(response[_key][_idx])
+        return float(response[_key][_idx]["value"])
 
     async def get_compressor_output_temperature(self, position: int | None = 1) -> float:
         """Get compressor output temperature."""
         response: ValueResponse = await self._read_values(
             request=HeatPump.COMPRESSOR_OUTPUT_TEMPERATURE,
             position=position,
+            extra_attributes=True,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HeatPump.COMPRESSOR_OUTPUT_TEMPERATURE)
-        return float(response[_key][_idx])
+        return float(response[_key][_idx]["value"])
 
     async def get_compressor(self, position: int | None = 1) -> float:
         """Get compressor."""
         response: ValueResponse = await self._read_values(
             request=HeatPump.COMPRESSOR,
             position=position,
+            extra_attributes=True,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HeatPump.COMPRESSOR)
-        return float(response[_key][_idx])
+        return float(response[_key][_idx]["value"])
 
     async def get_high_pressure(self, position: int | None = 1) -> float:
         """Get high pressure in bar."""
         response: ValueResponse = await self._read_values(
             request=HeatPump.HIGH_PRESSURE,
             position=position,
+            extra_attributes=True,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HeatPump.HIGH_PRESSURE)
-        return float(response[_key][_idx])
+        return float(response[_key][_idx]["value"])
 
     async def get_low_pressure(self, position: int | None = 1) -> float:
         """Get low pressure in bar."""
         response: ValueResponse = await self._read_values(
             request=HeatPump.LOW_PRESSURE,
             position=position,
+            extra_attributes=True,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HeatPump.LOW_PRESSURE)
-        return float(response[_key][_idx])
+        return float(response[_key][_idx]["value"])
 
 
 class HeatCircuitSection(BaseSection):
@@ -577,30 +618,33 @@ class HeatCircuitSection(BaseSection):
         response: ValueResponse = await self._read_values(
             request=HeatCircuit.NAME,
             position=position,
+            extra_attributes=True,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HeatCircuit.NAME)
-        return str(response[_key][_idx])
+        return str(response[_key][_idx]["value"])
 
     async def get_temperature(self, position: int | None = 1) -> float:
         """Get temperature."""
         response: ValueResponse = await self._read_values(
             request=HeatCircuit.TEMPERATURE,
             position=position,
+            extra_attributes=True,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HeatCircuit.TEMPERATURE)
-        return float(response[_key][_idx])
+        return float(response[_key][_idx]["value"])
 
     async def get_day_temperature(self, position: int | None = 1) -> float:
         """Get day temperature."""
         response: ValueResponse = await self._read_values(
             request=HeatCircuit.DAY_TEMPERATURE,
             position=position,
+            extra_attributes=True,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HeatCircuit.DAY_TEMPERATURE)
-        return float(response[_key][_idx])
+        return float(response[_key][_idx]["value"])
 
     async def set_day_temperature(self, temperature: int, position: int = 1) -> None:
         """Set temperature."""
@@ -612,20 +656,22 @@ class HeatCircuitSection(BaseSection):
         response: ValueResponse = await self._read_values(
             request=HeatCircuit.DAY_TEMPERATURE_THRESHOLD,
             position=position,
+            extra_attributes=True,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HeatCircuit.DAY_TEMPERATURE_THRESHOLD)
-        return float(response[_key][_idx])
+        return float(response[_key][_idx]["value"])
 
     async def get_night_temperature(self, position: int | None = 1) -> float | None:
         """Get night temperature."""
         response: ValueResponse = await self._read_values(
             request=HeatCircuit.NIGHT_TEMPERATURE,
             position=position,
+            extra_attributes=True,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HeatCircuit.NIGHT_TEMPERATURE)
-        return float(response[_key][_idx])
+        return float(response[_key][_idx]["value"])
 
     async def set_night_temperature(self, temperature: int, position: int = 1) -> None:
         """Set night temperature."""
@@ -637,30 +683,33 @@ class HeatCircuitSection(BaseSection):
         response: ValueResponse = await self._read_values(
             request=HeatCircuit.NIGHT_TEMPERATURE_THRESHOLD,
             position=position,
+            extra_attributes=True,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HeatCircuit.NIGHT_TEMPERATURE_THRESHOLD)
-        return float(response[_key][_idx])
+        return float(response[_key][_idx]["value"])
 
     async def get_holiday_temperature(self, position: int | None = 1) -> float:
         """Get holiday temperature."""
         response: ValueResponse = await self._read_values(
             request=HeatCircuit.HOLIDAY_TEMPERATURE,
             position=position,
+            extra_attributes=True,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HeatCircuit.HOLIDAY_TEMPERATURE)
-        return float(response[_key][_idx])
+        return float(response[_key][_idx]["value"])
 
     async def get_offset_temperature(self, position: int | None = 1) -> float:
         """Get offset temperature."""
         response: ValueResponse = await self._read_values(
             request=HeatCircuit.OFFSET_TEMPERATURE,
             position=position,
+            extra_attributes=True,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HeatCircuit.OFFSET_TEMPERATURE)
-        return float(response[_key][_idx])
+        return float(response[_key][_idx]["value"])
 
     async def set_offset_temperature(self, offset: float, position: int = 1) -> None:
         """Set offset temperature."""
@@ -673,14 +722,15 @@ class HeatCircuitSection(BaseSection):
             request=HeatCircuit.OPERATING_MODE,
             position=position,
             human_readable=human_readable,
+            extra_attributes=True,
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HeatCircuit.OPERATING_MODE)
 
         try:
-            _value: int | str = int(response[_key][_idx])
+            _value: int | str = int(response[_key][_idx]["value"])
         except ValueError:
-            _value = str(response[_key][_idx])
+            _value = str(response[_key][_idx]["value"])
 
         return _value
 

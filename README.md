@@ -80,11 +80,12 @@ asyncio.run(main())
 
 ### API endpoints
 
-| Endpoint                                          | Response | Description                                  |
-|---------------------------------------------------|----------|----------------------------------------------|
-| `.get_outdoor_temperature()`                      | `float`  | Get outdoor temperature.                     |
-| `.read_values(request, position, human_readable)` |          | Get multiple values with one http request.   |
-| `.write_values(request)`                          |          | Write multiple values with one http request. |
+| Endpoint                                                             | Response | Description                                        |
+|----------------------------------------------------------------------|----------|----------------------------------------------------|
+| `.get_outdoor_temperature()`                                         | `float`  | Get outdoor temperature.                           |
+| `.read_values(request, position, human_readable)`                    |          | Get multiple values with one http request.         |
+| `.read_values_grouped_by_section(request, position, human_readable)` |          | Get multiple grouped values with one http request. |
+| `.write_values(request)`                                             |          | Write multiple values with one http request.       |
 
 #### Device
 

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.8.0] - 2023-10-20
+
+### Added
+
+- Added `read_values_grouped_by_section()` endpoint.
+- Added `attributes` to `read_values()` response. 
+
+
 ## [1.7.0] - 2023-10-19
 
 ### Added

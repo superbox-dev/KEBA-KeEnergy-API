@@ -9,6 +9,7 @@ from keba_keenergy_api.constants import Control
 from keba_keenergy_api.constants import HeatCircuit
 from keba_keenergy_api.constants import HeatPump
 from keba_keenergy_api.constants import HotWaterTank
+from keba_keenergy_api.constants import Options
 from keba_keenergy_api.constants import Outdoor
 from keba_keenergy_api.endpoints import ValueResponse
 from keba_keenergy_api.error import APIError
@@ -22,7 +23,19 @@ class TestKebaKeEnergyAPI:
         with aioresponses() as mock_keenergy_api:
             mock_keenergy_api.post(
                 "http://mocked-host/var/readWriteVars",
-                payload=[{"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue", "value": "10.808357"}],
+                payload=[
+                    {
+                        "name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Exterior temp.",
+                            "lowerLimit": "-100",
+                            "unitId": "Temp",
+                            "upperLimit": "100",
+                        },
+                        "value": "10.808357",
+                    },
+                ],
                 headers={"Content-Type": "application/json;charset=utf-8"},
             )
 
@@ -34,7 +47,7 @@ class TestKebaKeEnergyAPI:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -45,7 +58,19 @@ class TestKebaKeEnergyAPI:
         with aioresponses() as mock_keenergy_api:
             mock_keenergy_api.post(
                 "http://mocked-host/var/readWriteVars",
-                payload=[{"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue", "value": "10.808357"}],
+                payload=[
+                    {
+                        "name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Exterior temp.",
+                            "lowerLimit": "-100",
+                            "unitId": "Temp",
+                            "upperLimit": "100",
+                        },
+                        "value": "10.808357",
+                    },
+                ],
                 headers={"Content-Type": "application/json;charset=utf-8"},
             )
 
@@ -61,7 +86,7 @@ class TestKebaKeEnergyAPI:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -82,11 +107,30 @@ class TestKebaKeEnergyAPI:
                 1,
                 None,
                 [
-                    {"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue", "value": "10.808357"},
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Room temp. Nom.",
+                            "lowerLimit": "10",
+                            "unitId": "Temp",
+                            "upperLimit": "90",
+                        },
+                        "value": "10.808357",
+                    },
                 ],
-                '[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue", "attr": "0"}]',
+                '[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue", "attr": "1"}]',
                 {
-                    "HEAT_CIRCUIT_TEMPERATURE": (10.81,),
+                    "HEAT_CIRCUIT_TEMPERATURE": [
+                        {
+                            "value": 10.81,
+                            "attributes": {
+                                "lowerLimit": "10",
+                                "unitId": "Temp",
+                                "upperLimit": "90",
+                            },
+                        },
+                    ],
                 },
             ),
             (
@@ -94,49 +138,212 @@ class TestKebaKeEnergyAPI:
                 [1, 3],
                 None,
                 [
-                    {"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue", "value": "10.808357"},
-                    {"name": "APPL.CtrlAppl.sParam.heatCircuit[2].values.setValue", "value": "11.808357"},
-                    {"name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatFlow.values.actValue", "value": "24.200001"},
-                    {"name": "APPL.CtrlAppl.sParam.heatpump[2].TempHeatFlow.values.actValue", "value": "23.200001"},
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Room temp. Nom.",
+                            "lowerLimit": "10",
+                            "unitId": "Temp",
+                            "upperLimit": "90",
+                        },
+                        "value": "10.808357",
+                    },
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatCircuit[2].values.setValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Room temp. Nom.",
+                            "lowerLimit": "10",
+                            "unitId": "Temp",
+                            "upperLimit": "90",
+                        },
+                        "value": "11.808357",
+                    },
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatFlow.values.actValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Inflow temp.",
+                            "unitId": "Temp",
+                        },
+                        "value": "24.200001",
+                    },
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatpump[2].TempHeatFlow.values.actValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Inflow temp.",
+                            "unitId": "Temp",
+                        },
+                        "value": "23.200001",
+                    },
                 ],
                 (
-                    '[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue", "attr": "0"}, '
-                    '{"name": "APPL.CtrlAppl.sParam.heatCircuit[2].values.setValue", "attr": "0"}, '
-                    '{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatFlow.values.actValue", "attr": "0"}, '
-                    '{"name": "APPL.CtrlAppl.sParam.heatpump[2].TempHeatFlow.values.actValue", "attr": "0"}]'
+                    '[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue", "attr": "1"}, '
+                    '{"name": "APPL.CtrlAppl.sParam.heatCircuit[2].values.setValue", "attr": "1"}, '
+                    '{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatFlow.values.actValue", "attr": "1"}, '
+                    '{"name": "APPL.CtrlAppl.sParam.heatpump[2].TempHeatFlow.values.actValue", "attr": "1"}]'
                 ),
                 {
-                    "HEAT_CIRCUIT_TEMPERATURE": (10.81, 11.81),
-                    "HEAT_PUMP_INFLOW_TEMPERATURE": (24.2, 23.2),
+                    "HEAT_CIRCUIT_TEMPERATURE": [
+                        {
+                            "value": 10.81,
+                            "attributes": {
+                                "lowerLimit": "10",
+                                "unitId": "Temp",
+                                "upperLimit": "90",
+                            },
+                        },
+                        {
+                            "value": 11.81,
+                            "attributes": {
+                                "lowerLimit": "10",
+                                "unitId": "Temp",
+                                "upperLimit": "90",
+                            },
+                        },
+                    ],
+                    "HEAT_PUMP_INFLOW_TEMPERATURE": [
+                        {
+                            "value": 24.2,
+                            "attributes": {
+                                "unitId": "Temp",
+                            },
+                        },
+                        {
+                            "value": 23.2,
+                            "attributes": {
+                                "unitId": "Temp",
+                            },
+                        },
+                    ],
                 },
             ),
             (
                 [Outdoor.TEMPERATURE, HeatCircuit.TEMPERATURE, HeatPump.INFLOW_TEMPERATURE],
                 None,
                 [
-                    {"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatPumps", "value": "2"},
-                    {"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatingCircuits", "value": "1"},
-                    {"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHotWaterTanks", "value": "1"},
+                    {
+                        "name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatPumps",
+                        "attributes": {
+                            "dynLowerLimit": 1,
+                            "dynUpperLimit": 1,
+                            "formatId": "fmt2p0",
+                            "longText": "Qty heat pumps",
+                            "lowerLimit": "0",
+                            "upperLimit": "4",
+                        },
+                        "value": "2",
+                    },
+                    {
+                        "name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatingCircuits",
+                        "attributes": {
+                            "dynLowerLimit": 1,
+                            "dynUpperLimit": 1,
+                            "formatId": "fmt2p0",
+                            "longText": "Qty HC",
+                            "lowerLimit": "0",
+                            "upperLimit": "8",
+                        },
+                        "value": "1",
+                    },
+                    {
+                        "name": "APPL.CtrlAppl.sParam.options.systemNumberOfHotWaterTanks",
+                        "attributes": {
+                            "dynLowerLimit": 1,
+                            "dynUpperLimit": 1,
+                            "formatId": "fmt2p0",
+                            "longText": "Qty HW tank",
+                            "lowerLimit": "0",
+                            "upperLimit": "4",
+                        },
+                        "value": "1",
+                    },
                 ],
                 [
-                    {"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue", "value": "17.54"},
-                    {"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue", "value": "10.808357"},
-                    {"name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatFlow.values.actValue", "value": "24.200001"},
-                    {"name": "APPL.CtrlAppl.sParam.heatpump[1].TempHeatFlow.values.actValue", "value": "23.200001"},
+                    {
+                        "name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Exterior temp.",
+                            "lowerLimit": "-100",
+                            "unitId": "Temp",
+                            "upperLimit": "100",
+                        },
+                        "value": "17.54",
+                    },
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Room temp. Nom.",
+                            "lowerLimit": "10",
+                            "unitId": "Temp",
+                            "upperLimit": "90",
+                        },
+                        "value": "10.808357",
+                    },
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatFlow.values.actValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Inflow temp.",
+                            "unitId": "Temp",
+                        },
+                        "value": "24.200001",
+                    },
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatpump[1].TempHeatFlow.values.actValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Inflow temp.",
+                            "unitId": "Temp",
+                        },
+                        "value": "23.200001",
+                    },
                 ],
                 (
-                    '[{"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue", "attr": "0"}, '
-                    '{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue", "attr": "0"}, '
-                    '{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatFlow.values.actValue", "attr": "0"}, '
-                    '{"name": "APPL.CtrlAppl.sParam.heatpump[1].TempHeatFlow.values.actValue", "attr": "0"}]'
+                    '[{"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue", "attr": "1"}, '
+                    '{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue", "attr": "1"}, '
+                    '{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatFlow.values.actValue", "attr": "1"}, '
+                    '{"name": "APPL.CtrlAppl.sParam.heatpump[1].TempHeatFlow.values.actValue", "attr": "1"}]'
                 ),
                 {
-                    "OUTDOOR_TEMPERATURE": (17.54,),
-                    "HEAT_CIRCUIT_TEMPERATURE": (10.81,),
-                    "HEAT_PUMP_INFLOW_TEMPERATURE": (
-                        24.2,
-                        23.2,
-                    ),
+                    "OUTDOOR_TEMPERATURE": [
+                        {
+                            "value": 17.54,
+                            "attributes": {
+                                "lowerLimit": "-100",
+                                "unitId": "Temp",
+                                "upperLimit": "100",
+                            },
+                        },
+                    ],
+                    "HEAT_CIRCUIT_TEMPERATURE": [
+                        {
+                            "value": 10.81,
+                            "attributes": {
+                                "lowerLimit": "10",
+                                "unitId": "Temp",
+                                "upperLimit": "90",
+                            },
+                        },
+                    ],
+                    "HEAT_PUMP_INFLOW_TEMPERATURE": [
+                        {
+                            "value": 24.2,
+                            "attributes": {
+                                "unitId": "Temp",
+                            },
+                        },
+                        {
+                            "value": 23.2,
+                            "attributes": {
+                                "unitId": "Temp",
+                            },
+                        },
+                    ],
                 },
             ),
         ],
@@ -167,6 +374,351 @@ class TestKebaKeEnergyAPI:
 
             client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
             response: ValueResponse = await client.read_values(request=control, position=position)
+
+            assert isinstance(response, dict)
+            assert response == expected_response
+
+            mock_keenergy_api.assert_called_with(
+                url="http://mocked-host/var/readWriteVars",
+                data=expected_data,
+                method="POST",
+                ssl=False,
+            )
+
+    @pytest.mark.asyncio()
+    @pytest.mark.parametrize(
+        (
+            "control",
+            "position",
+            "option_payload",
+            "payload",
+            "expected_data",
+            "expected_response",
+        ),
+        [
+            (
+                [
+                    Options.HOT_WATER_TANK_NUMBERS,
+                    HotWaterTank.TEMPERATURE,
+                ],
+                1,
+                None,
+                [
+                    {
+                        "name": "APPL.CtrlAppl.sParam.options.systemNumberOfHotWaterTanks",
+                        "attributes": {
+                            "dynLowerLimit": 1,
+                            "dynUpperLimit": 1,
+                            "formatId": "fmt2p0",
+                            "longText": "Qty heat pumps",
+                            "lowerLimit": "0",
+                            "upperLimit": "4",
+                        },
+                        "value": "2",
+                    },
+                    {
+                        "name": "APPL.CtrlAppl.sParam.hotWaterTank[0].topTemp.values.actValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Temp. act.",
+                            "lowerLimit": "20",
+                            "unitId": "Temp",
+                            "upperLimit": "90",
+                        },
+                        "value": "40.808357",
+                    },
+                ],
+                (
+                    '[{"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHotWaterTanks", "attr": "1"}, '
+                    '{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].topTemp.values.actValue", "attr": "1"}]'
+                ),
+                {
+                    "OUTDOOR": {},
+                    "OPTIONS": {
+                        "options_hot_water_tank_numbers": [
+                            {
+                                "attributes": {
+                                    "lowerLimit": "0",
+                                    "upperLimit": "4",
+                                },
+                                "value": 2,
+                            },
+                        ],
+                    },
+                    "HOT_WATER_TANK": {
+                        "hot_water_tank_temperature": [
+                            {
+                                "value": 40.81,
+                                "attributes": {
+                                    "lowerLimit": "20",
+                                    "unitId": "Temp",
+                                    "upperLimit": "90",
+                                },
+                            },
+                        ],
+                    },
+                    "HEAT_PUMP": {},
+                    "HEAT_CIRCUIT": {},
+                },
+            ),
+            (
+                [HeatCircuit.TEMPERATURE, HeatPump.INFLOW_TEMPERATURE],
+                [1, 3],
+                None,
+                [
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Room temp. Nom.",
+                            "lowerLimit": "10",
+                            "unitId": "Temp",
+                            "upperLimit": "90",
+                        },
+                        "value": "10.808357",
+                    },
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatCircuit[2].values.setValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Room temp. Nom.",
+                            "lowerLimit": "10",
+                            "unitId": "Temp",
+                            "upperLimit": "90",
+                        },
+                        "value": "11.808357",
+                    },
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatFlow.values.actValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Inflow temp.",
+                            "unitId": "Temp",
+                        },
+                        "value": "24.200001",
+                    },
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatpump[2].TempHeatFlow.values.actValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Inflow temp.",
+                            "unitId": "Temp",
+                        },
+                        "value": "23.200001",
+                    },
+                ],
+                (
+                    '[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue", "attr": "1"}, '
+                    '{"name": "APPL.CtrlAppl.sParam.heatCircuit[2].values.setValue", "attr": "1"}, '
+                    '{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatFlow.values.actValue", "attr": "1"}, '
+                    '{"name": "APPL.CtrlAppl.sParam.heatpump[2].TempHeatFlow.values.actValue", "attr": "1"}]'
+                ),
+                {
+                    "OUTDOOR": {},
+                    "OPTIONS": {},
+                    "HOT_WATER_TANK": {},
+                    "HEAT_CIRCUIT": {
+                        "heat_circuit_temperature": [
+                            {
+                                "value": 10.81,
+                                "attributes": {
+                                    "lowerLimit": "10",
+                                    "unitId": "Temp",
+                                    "upperLimit": "90",
+                                },
+                            },
+                            {
+                                "value": 11.81,
+                                "attributes": {
+                                    "lowerLimit": "10",
+                                    "unitId": "Temp",
+                                    "upperLimit": "90",
+                                },
+                            },
+                        ],
+                    },
+                    "HEAT_PUMP": {
+                        "heat_pump_inflow_temperature": [
+                            {
+                                "value": 24.2,
+                                "attributes": {
+                                    "unitId": "Temp",
+                                },
+                            },
+                            {
+                                "value": 23.2,
+                                "attributes": {
+                                    "unitId": "Temp",
+                                },
+                            },
+                        ],
+                    },
+                },
+            ),
+            (
+                [Outdoor.TEMPERATURE, HeatCircuit.TEMPERATURE, HeatPump.INFLOW_TEMPERATURE],
+                None,
+                [
+                    {
+                        "name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatPumps",
+                        "attributes": {
+                            "dynLowerLimit": 1,
+                            "dynUpperLimit": 1,
+                            "formatId": "fmt2p0",
+                            "longText": "Qty heat pumps",
+                            "lowerLimit": "0",
+                            "upperLimit": "4",
+                        },
+                        "value": "2",
+                    },
+                    {
+                        "name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatingCircuits",
+                        "attributes": {
+                            "dynLowerLimit": 1,
+                            "dynUpperLimit": 1,
+                            "formatId": "fmt2p0",
+                            "longText": "Qty HC",
+                            "lowerLimit": "0",
+                            "upperLimit": "8",
+                        },
+                        "value": "1",
+                    },
+                    {
+                        "name": "APPL.CtrlAppl.sParam.options.systemNumberOfHotWaterTanks",
+                        "attributes": {
+                            "dynLowerLimit": 1,
+                            "dynUpperLimit": 1,
+                            "formatId": "fmt2p0",
+                            "longText": "Qty HW tank",
+                            "lowerLimit": "0",
+                            "upperLimit": "4",
+                        },
+                        "value": "1",
+                    },
+                ],
+                [
+                    {
+                        "name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Exterior temp.",
+                            "lowerLimit": "-100",
+                            "unitId": "Temp",
+                            "upperLimit": "100",
+                        },
+                        "value": "17.54",
+                    },
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Room temp. Nom.",
+                            "lowerLimit": "10",
+                            "unitId": "Temp",
+                            "upperLimit": "90",
+                        },
+                        "value": "10.808357",
+                    },
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatFlow.values.actValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Inflow temp.",
+                            "unitId": "Temp",
+                        },
+                        "value": "24.200001",
+                    },
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatpump[1].TempHeatFlow.values.actValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Inflow temp.",
+                            "unitId": "Temp",
+                        },
+                        "value": "23.200001",
+                    },
+                ],
+                (
+                    '[{"name": "APPL.CtrlAppl.sParam.outdoorTemp.values.actValue", "attr": "1"}, '
+                    '{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue", "attr": "1"}, '
+                    '{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatFlow.values.actValue", "attr": "1"}, '
+                    '{"name": "APPL.CtrlAppl.sParam.heatpump[1].TempHeatFlow.values.actValue", "attr": "1"}]'
+                ),
+                {
+                    "OUTDOOR": {
+                        "outdoor_temperature": [
+                            {
+                                "value": 17.54,
+                                "attributes": {
+                                    "lowerLimit": "-100",
+                                    "unitId": "Temp",
+                                    "upperLimit": "100",
+                                },
+                            },
+                        ],
+                    },
+                    "OPTIONS": {},
+                    "HOT_WATER_TANK": {},
+                    "HEAT_PUMP": {
+                        "heat_pump_inflow_temperature": [
+                            {
+                                "value": 24.2,
+                                "attributes": {
+                                    "unitId": "Temp",
+                                },
+                            },
+                            {
+                                "value": 23.2,
+                                "attributes": {
+                                    "unitId": "Temp",
+                                },
+                            },
+                        ],
+                    },
+                    "HEAT_CIRCUIT": {
+                        "heat_circuit_temperature": [
+                            {
+                                "value": 10.81,
+                                "attributes": {
+                                    "lowerLimit": "10",
+                                    "unitId": "Temp",
+                                    "upperLimit": "90",
+                                },
+                            },
+                        ],
+                    },
+                },
+            ),
+        ],
+    )
+    async def test_read_values_grouped_by_section(
+        self,
+        control: Control,
+        position: int | None | list[int | None],
+        option_payload: list[dict[str, str]] | None,
+        payload: list[dict[str, str]],
+        expected_data: str,
+        expected_response: ValueResponse,
+    ) -> None:
+        """Test read multiple values."""
+        with aioresponses() as mock_keenergy_api:
+            if option_payload is not None:
+                mock_keenergy_api.post(
+                    "http://mocked-host/var/readWriteVars",
+                    payload=option_payload,
+                    headers={"Content-Type": "application/json;charset=utf-8"},
+                )
+
+            mock_keenergy_api.post(
+                "http://mocked-host/var/readWriteVars",
+                payload=payload,
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
+
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+            response: dict[str, ValueResponse] = await client.read_values_grouped_by_section(
+                request=control, position=position,
+            )
 
             assert isinstance(response, dict)
             assert response == expected_response

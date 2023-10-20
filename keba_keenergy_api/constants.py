@@ -17,6 +17,8 @@ class Endpoint:
 
 class HotWaterTankOperatingMode(IntEnum):
     OFF: Final[int] = 0
+    AUTO: Final[int] = 1
+    ON: Final[int] = 2
     HEAT_UP: Final[int] = 3
 
 
@@ -108,6 +110,16 @@ class HeatCircuit(Enum):
         read_only=False,
         human_readable=HeatCircuitOperatingMode,
     )
+
+
+class SystemPrefix(str, Enum):
+    """System prefixes."""
+
+    OPTIONS: Final[str] = "OPTIONS_"
+    OUTDOOR: Final[str] = "OUTDOOR_"
+    HOT_WATER_TANK: Final[str] = "HOT_WATER_TANK_"
+    HEAT_PUMP: Final[str] = "HEAT_PUMP_"
+    HEAT_CIRCUIT = "HEAT_CIRCUIT_"
 
 
 Control: TypeAlias = Options | Outdoor | HotWaterTank | HeatPump | HeatCircuit

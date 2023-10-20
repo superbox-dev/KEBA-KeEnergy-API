@@ -214,14 +214,38 @@ class TestOptionSection:
                 payload=[
                     {
                         "name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatPumps",
+                        "attributes": {
+                            "dynLowerLimit": 1,
+                            "dynUpperLimit": 1,
+                            "formatId": "fmt2p0",
+                            "longText": "Qty heat pumps",
+                            "lowerLimit": "0",
+                            "upperLimit": "4",
+                        },
                         "value": "2",
                     },
                     {
                         "name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatingCircuits",
+                        "attributes": {
+                            "dynLowerLimit": 1,
+                            "dynUpperLimit": 1,
+                            "formatId": "fmt2p0",
+                            "longText": "Qty HC",
+                            "lowerLimit": "0",
+                            "upperLimit": "8",
+                        },
                         "value": "1",
                     },
                     {
                         "name": "APPL.CtrlAppl.sParam.options.systemNumberOfHotWaterTanks",
+                        "attributes": {
+                            "dynLowerLimit": 1,
+                            "dynUpperLimit": 1,
+                            "formatId": "fmt2p0",
+                            "longText": "Qty HW tank",
+                            "lowerLimit": "0",
+                            "upperLimit": "4",
+                        },
                         "value": "1",
                     },
                 ],
@@ -239,9 +263,9 @@ class TestOptionSection:
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
                 data=(
-                    '[{"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatPumps", "attr": "0"}, '
-                    '{"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatingCircuits", "attr": "0"}, '
-                    '{"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHotWaterTanks", "attr": "0"}]'
+                    '[{"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatPumps", "attr": "1"}, '
+                    '{"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatingCircuits", "attr": "1"}, '
+                    '{"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHotWaterTanks", "attr": "1"}]'
                 ),
                 method="POST",
                 ssl=False,
@@ -256,6 +280,14 @@ class TestOptionSection:
                 payload=[
                     {
                         "name": "APPL.CtrlAppl.sParam.options.systemNumberOfHotWaterTanks",
+                        "attributes": {
+                            "dynLowerLimit": 1,
+                            "dynUpperLimit": 1,
+                            "formatId": "fmt2p0",
+                            "longText": "Qty HW tank",
+                            "lowerLimit": "0",
+                            "upperLimit": "4",
+                        },
                         "value": "2",
                     },
                 ],
@@ -270,7 +302,7 @@ class TestOptionSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHotWaterTanks", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHotWaterTanks", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -284,6 +316,14 @@ class TestOptionSection:
                 payload=[
                     {
                         "name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatPumps",
+                        "attributes": {
+                            "dynLowerLimit": 1,
+                            "dynUpperLimit": 1,
+                            "formatId": "fmt2p0",
+                            "longText": "Qty heat pumps",
+                            "lowerLimit": "0",
+                            "upperLimit": "4",
+                        },
                         "value": "1",
                     },
                 ],
@@ -298,7 +338,7 @@ class TestOptionSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatPumps", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatPumps", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -312,6 +352,14 @@ class TestOptionSection:
                 payload=[
                     {
                         "name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatingCircuits",
+                        "attributes": {
+                            "dynLowerLimit": 1,
+                            "dynUpperLimit": 1,
+                            "formatId": "fmt2p0",
+                            "longText": "Qty HC",
+                            "lowerLimit": "0",
+                            "upperLimit": "8",
+                        },
                         "value": "3",
                     },
                 ],
@@ -326,7 +374,7 @@ class TestOptionSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatingCircuits", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatingCircuits", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -342,6 +390,13 @@ class TestHotWaterTankSection:
                 payload=[
                     {
                         "name": "APPL.CtrlAppl.sParam.hotWaterTank[0].topTemp.values.actValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Temp. act.",
+                            "lowerLimit": "20",
+                            "unitId": "Temp",
+                            "upperLimit": "90",
+                        },
                         "value": "58.900002",
                     },
                 ],
@@ -356,7 +411,7 @@ class TestHotWaterTankSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].topTemp.values.actValue", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].topTemp.values.actValue", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -379,6 +434,13 @@ class TestHotWaterTankSection:
                 payload=[
                     {
                         "name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.operatingMode",
+                        "attributes": {
+                            "formatId": "fmtHotWaterTank",
+                            "longText": "Op.mode",
+                            "lowerLimit": "0",
+                            "unitId": "Enum",
+                            "upperLimit": "32767",
+                        },
                         "value": f"{payload_value}",
                     },
                 ],
@@ -393,7 +455,7 @@ class TestHotWaterTankSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.operatingMode", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.operatingMode", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -531,7 +593,20 @@ class TestHotWaterTankSection:
         with aioresponses() as mock_keenergy_api:
             mock_keenergy_api.post(
                 "http://mocked-host/var/readWriteVars",
-                payload=[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.reducedSetTempMax.value", "value": "0"}],
+                payload=[
+                    {
+                        "name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.reducedSetTempMax.value",
+                        "attributes": {
+                            "dynUpperLimit": 1,
+                            "formatId": "fmtTemp",
+                            "longText": "Sup.temp.",
+                            "lowerLimit": "0",
+                            "unitId": "Temp",
+                            "upperLimit": "52",
+                        },
+                        "value": "0",
+                    },
+                ],
                 headers={"Content-Type": "application/json;charset=utf-8"},
             )
 
@@ -543,7 +618,7 @@ class TestHotWaterTankSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.reducedSetTempMax.value", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.reducedSetTempMax.value", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -574,7 +649,20 @@ class TestHotWaterTankSection:
         with aioresponses() as mock_keenergy_api:
             mock_keenergy_api.post(
                 "http://mocked-host/var/readWriteVars",
-                payload=[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.normalSetTempMax.value", "value": "47"}],
+                payload=[
+                    {
+                        "name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.normalSetTempMax.value",
+                        "attributes": {
+                            "dynUpperLimit": 1,
+                            "formatId": "fmtTemp",
+                            "longText": "Temp. nom.",
+                            "lowerLimit": "0",
+                            "unitId": "Temp",
+                            "upperLimit": "52",
+                        },
+                        "value": "47",
+                    },
+                ],
                 headers={"Content-Type": "application/json;charset=utf-8"},
             )
 
@@ -586,7 +674,7 @@ class TestHotWaterTankSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.normalSetTempMax.value", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.normalSetTempMax.value", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -619,7 +707,15 @@ class TestHeatPumpSection:
         with aioresponses() as mock_keenergy_api:
             mock_keenergy_api.post(
                 "http://mocked-host/var/readWriteVars",
-                payload=[{"name": "APPL.CtrlAppl.sParam.heatpump[0].param.name", "value": "WPS26"}],
+                payload=[
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatpump[0].param.name",
+                        "attributes": {
+                            "longText": "Name",
+                        },
+                        "value": "WPS26",
+                    },
+                ],
                 headers={"Content-Type": "application/json;charset=utf-8"},
             )
 
@@ -631,7 +727,7 @@ class TestHeatPumpSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].param.name", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].param.name", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -654,6 +750,13 @@ class TestHeatPumpSection:
                 payload=[
                     {
                         "name": "APPL.CtrlAppl.sParam.heatpump[0].values.heatpumpState",
+                        "attributes": {
+                            "formatId": "fmtHPState",
+                            "longText": "State",
+                            "lowerLimit": "0",
+                            "unitId": "Enum",
+                            "upperLimit": "32767",
+                        },
                         "value": f"{payload_value}",
                     },
                 ],
@@ -668,7 +771,7 @@ class TestHeatPumpSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].values.heatpumpState", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].values.heatpumpState", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -679,7 +782,19 @@ class TestHeatPumpSection:
         with aioresponses() as mock_keenergy_api:
             mock_keenergy_api.post(
                 "http://mocked-host/var/readWriteVars",
-                payload=[{"name": "APPL.CtrlAppl.sParam.heatpump[0].CircPump.values.setValueScaled", "value": "0.5"}],
+                payload=[
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatpump[0].CircPump.values.setValueScaled",
+                        "attributes": {
+                            "formatId": "fmt3p0",
+                            "longText": "Circulation pump",
+                            "lowerLimit": "0.0",
+                            "unitId": "Pct100",
+                            "upperLimit": "1",
+                        },
+                        "value": "0.5",
+                    },
+                ],
                 headers={"Content-Type": "application/json;charset=utf-8"},
             )
 
@@ -691,7 +806,7 @@ class TestHeatPumpSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].CircPump.values.setValueScaled", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].CircPump.values.setValueScaled", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -705,6 +820,11 @@ class TestHeatPumpSection:
                 payload=[
                     {
                         "name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatFlow.values.actValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Inflow temp.",
+                            "unitId": "Temp",
+                        },
                         "value": "24.200001",
                     },
                 ],
@@ -719,7 +839,7 @@ class TestHeatPumpSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatFlow.values.actValue", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatFlow.values.actValue", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -733,6 +853,11 @@ class TestHeatPumpSection:
                 payload=[
                     {
                         "name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatReflux.values.actValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Reflux temp.",
+                            "unitId": "Temp",
+                        },
                         "value": "23.200001",
                     },
                 ],
@@ -747,7 +872,7 @@ class TestHeatPumpSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatReflux.values.actValue", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempHeatReflux.values.actValue", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -761,6 +886,11 @@ class TestHeatPumpSection:
                 payload=[
                     {
                         "name": "APPL.CtrlAppl.sParam.heatpump[0].TempSourceIn.values.actValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Source in temp.",
+                            "unitId": "Temp",
+                        },
                         "value": "22.700001",
                     },
                 ],
@@ -775,7 +905,7 @@ class TestHeatPumpSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempSourceIn.values.actValue", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempSourceIn.values.actValue", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -786,7 +916,17 @@ class TestHeatPumpSection:
         with aioresponses() as mock_keenergy_api:
             mock_keenergy_api.post(
                 "http://mocked-host/var/readWriteVars",
-                payload=[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempSourceOut.values.actValue", "value": "24.6"}],
+                payload=[
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatpump[0].TempSourceOut.values.actValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Source out temp.",
+                            "unitId": "Temp",
+                        },
+                        "value": "24.6",
+                    },
+                ],
                 headers={"Content-Type": "application/json;charset=utf-8"},
             )
 
@@ -798,7 +938,7 @@ class TestHeatPumpSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempSourceOut.values.actValue", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempSourceOut.values.actValue", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -812,6 +952,11 @@ class TestHeatPumpSection:
                 payload=[
                     {
                         "name": "APPL.CtrlAppl.sParam.heatpump[0].TempCompressorIn.values.actValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Comp. in temp.",
+                            "unitId": "Temp",
+                        },
                         "value": "26.4",
                     },
                 ],
@@ -826,7 +971,7 @@ class TestHeatPumpSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempCompressorIn.values.actValue", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempCompressorIn.values.actValue", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -840,6 +985,11 @@ class TestHeatPumpSection:
                 payload=[
                     {
                         "name": "APPL.CtrlAppl.sParam.heatpump[0].TempCompressorOut.values.actValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Comp. out temp.",
+                            "unitId": "Temp",
+                        },
                         "value": "26.5",
                     },
                 ],
@@ -854,7 +1004,7 @@ class TestHeatPumpSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempCompressorOut.values.actValue", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].TempCompressorOut.values.actValue", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -865,7 +1015,19 @@ class TestHeatPumpSection:
         with aioresponses() as mock_keenergy_api:
             mock_keenergy_api.post(
                 "http://mocked-host/var/readWriteVars",
-                payload=[{"name": "APPL.CtrlAppl.sParam.heatpump[0].Compressor.values.setValueScaled", "value": "0.3"}],
+                payload=[
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatpump[0].Compressor.values.setValueScaled",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Compressor",
+                            "lowerLimit": "0.0",
+                            "unitId": "Pct100",
+                            "upperLimit": "1",
+                        },
+                        "value": "0.3",
+                    },
+                ],
                 headers={"Content-Type": "application/json;charset=utf-8"},
             )
 
@@ -877,7 +1039,7 @@ class TestHeatPumpSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].Compressor.values.setValueScaled", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].Compressor.values.setValueScaled", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -891,6 +1053,11 @@ class TestHeatPumpSection:
                 payload=[
                     {
                         "name": "APPL.CtrlAppl.sParam.heatpump[0].HighPressure.values.actValue",
+                        "attributes": {
+                            "formatId": "fmt3p2",
+                            "longText": "High pressure",
+                            "unitId": "PressBar",
+                        },
                         "value": "15.018749",
                     },
                 ],
@@ -905,7 +1072,7 @@ class TestHeatPumpSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].HighPressure.values.actValue", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].HighPressure.values.actValue", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -916,7 +1083,17 @@ class TestHeatPumpSection:
         with aioresponses() as mock_keenergy_api:
             mock_keenergy_api.post(
                 "http://mocked-host/var/readWriteVars",
-                payload=[{"name": "APPL.CtrlAppl.sParam.heatpump[0].LowPressure.values.actValue", "value": "14.8125"}],
+                payload=[
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatpump[0].LowPressure.values.actValue",
+                        "attributes": {
+                            "formatId": "fmt3p2",
+                            "longText": "Low pressure",
+                            "unitId": "PressBar",
+                        },
+                        "value": "14.8125",
+                    },
+                ],
                 headers={"Content-Type": "application/json;charset=utf-8"},
             )
 
@@ -928,7 +1105,7 @@ class TestHeatPumpSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].LowPressure.values.actValue", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].LowPressure.values.actValue", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -941,7 +1118,15 @@ class TestHeatCircuitSection:
         with aioresponses() as mock_keenergy_api:
             mock_keenergy_api.post(
                 "http://mocked-host/var/readWriteVars",
-                payload=[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.name", "value": "FBH"}],
+                payload=[
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.name",
+                        "attributes": {
+                            "longText": "Designation",
+                        },
+                        "value": "FBH",
+                    },
+                ],
                 headers={"Content-Type": "application/json;charset=utf-8"},
             )
 
@@ -953,7 +1138,7 @@ class TestHeatCircuitSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.name", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.name", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -964,7 +1149,19 @@ class TestHeatCircuitSection:
         with aioresponses() as mock_keenergy_api:
             mock_keenergy_api.post(
                 "http://mocked-host/var/readWriteVars",
-                payload=[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue", "value": "22"}],
+                payload=[
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Room temp. Nom.",
+                            "lowerLimit": "10",
+                            "unitId": "Temp",
+                            "upperLimit": "90",
+                        },
+                        "value": "22",
+                    },
+                ],
                 headers={"Content-Type": "application/json;charset=utf-8"},
             )
 
@@ -976,7 +1173,7 @@ class TestHeatCircuitSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.setValue", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -987,7 +1184,19 @@ class TestHeatCircuitSection:
         with aioresponses() as mock_keenergy_api:
             mock_keenergy_api.post(
                 "http://mocked-host/var/readWriteVars",
-                payload=[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.normalSetTemp", "value": "23"}],
+                payload=[
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.normalSetTemp",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Room temp. Day",
+                            "lowerLimit": "10",
+                            "unitId": "Temp",
+                            "upperLimit": "30",
+                        },
+                        "value": "23",
+                    },
+                ],
                 headers={"Content-Type": "application/json;charset=utf-8"},
             )
 
@@ -999,7 +1208,7 @@ class TestHeatCircuitSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.normalSetTemp", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.normalSetTemp", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -1030,7 +1239,19 @@ class TestHeatCircuitSection:
         with aioresponses() as mock_keenergy_api:
             mock_keenergy_api.post(
                 "http://mocked-host/var/readWriteVars",
-                payload=[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.thresholdDayTemp.value", "value": "16"}],
+                payload=[
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.thresholdDayTemp.value",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Heating limit Day",
+                            "lowerLimit": "-20",
+                            "unitId": "Temp",
+                            "upperLimit": "100",
+                        },
+                        "value": "16",
+                    },
+                ],
                 headers={"Content-Type": "application/json;charset=utf-8"},
             )
 
@@ -1042,7 +1263,7 @@ class TestHeatCircuitSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.thresholdDayTemp.value", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.thresholdDayTemp.value", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -1053,7 +1274,19 @@ class TestHeatCircuitSection:
         with aioresponses() as mock_keenergy_api:
             mock_keenergy_api.post(
                 "http://mocked-host/var/readWriteVars",
-                payload=[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.reducedSetTemp", "value": "23"}],
+                payload=[
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.reducedSetTemp",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Room temp. night",
+                            "lowerLimit": "10",
+                            "unitId": "Temp",
+                            "upperLimit": "30",
+                        },
+                        "value": "23",
+                    },
+                ],
                 headers={"Content-Type": "application/json;charset=utf-8"},
             )
 
@@ -1065,7 +1298,7 @@ class TestHeatCircuitSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.reducedSetTemp", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.reducedSetTemp", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -1096,7 +1329,19 @@ class TestHeatCircuitSection:
         with aioresponses() as mock_keenergy_api:
             mock_keenergy_api.post(
                 "http://mocked-host/var/readWriteVars",
-                payload=[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.thresholdNightTemp.value", "value": "16"}],
+                payload=[
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.thresholdNightTemp.value",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Heat limit Night",
+                            "lowerLimit": "-20",
+                            "unitId": "Temp",
+                            "upperLimit": "100",
+                        },
+                        "value": "16",
+                    },
+                ],
                 headers={"Content-Type": "application/json;charset=utf-8"},
             )
 
@@ -1108,7 +1353,7 @@ class TestHeatCircuitSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.thresholdNightTemp.value", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.thresholdNightTemp.value", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -1119,7 +1364,19 @@ class TestHeatCircuitSection:
         with aioresponses() as mock_keenergy_api:
             mock_keenergy_api.post(
                 "http://mocked-host/var/readWriteVars",
-                payload=[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.holidaySetTemp", "value": "14"}],
+                payload=[
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.holidaySetTemp",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Room temp. Vacation",
+                            "lowerLimit": "10",
+                            "unitId": "Temp",
+                            "upperLimit": "30",
+                        },
+                        "value": "14",
+                    },
+                ],
                 headers={"Content-Type": "application/json;charset=utf-8"},
             )
 
@@ -1131,7 +1388,7 @@ class TestHeatCircuitSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.holidaySetTemp", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.holidaySetTemp", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -1142,7 +1399,19 @@ class TestHeatCircuitSection:
         with aioresponses() as mock_keenergy_api:
             mock_keenergy_api.post(
                 "http://mocked-host/var/readWriteVars",
-                payload=[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.offsetRoomTemp", "value": "2"}],
+                payload=[
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.offsetRoomTemp",
+                        "attributes": {
+                            "formatId": "fmtTemp",
+                            "longText": "Room temp. Offset",
+                            "lowerLimit": "-2.5",
+                            "unitId": "TempRel",
+                            "upperLimit": "2.5",
+                        },
+                        "value": "2",
+                    },
+                ],
                 headers={"Content-Type": "application/json;charset=utf-8"},
             )
 
@@ -1154,7 +1423,7 @@ class TestHeatCircuitSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.offsetRoomTemp", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.offsetRoomTemp", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -1197,6 +1466,13 @@ class TestHeatCircuitSection:
                 payload=[
                     {
                         "name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.operatingMode",
+                        "attributes": {
+                            "formatId": "fmtHcMode",
+                            "longText": "Operating mode",
+                            "lowerLimit": "0",
+                            "unitId": "Enum",
+                            "upperLimit": "32767",
+                        },
                         "value": f"{payload_value}",
                     },
                 ],
@@ -1211,7 +1487,7 @@ class TestHeatCircuitSection:
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
-                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.operatingMode", "attr": "0"}]',
+                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.operatingMode", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
