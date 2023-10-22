@@ -33,6 +33,8 @@ class HeatCircuitOperatingMode(IntEnum):
     AUTO: Final[int] = 1
     DAY: Final[int] = 2
     NIGHT: Final[int] = 3
+    AWAY: Final[int] = 4
+    PARTY: Final[int] = 5
 
 
 OPTIONS_PREFIX: Final[str] = "APPL.CtrlAppl.sParam.options"
