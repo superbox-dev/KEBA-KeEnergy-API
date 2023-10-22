@@ -239,7 +239,7 @@ class BaseSection:
 
         return response
 
-    def _generate_write_payload(self, request: dict[Control, list[Any, ...]]) -> Payload:
+    def _generate_write_payload(self, request: dict[Control, list[Any]]) -> Payload:
         payload: Payload = []
 
         for control, values in request.items():
@@ -255,7 +255,7 @@ class BaseSection:
 
         return payload
 
-    async def _write_values(self, request: dict[Control, list[Any, ...]]) -> None:
+    async def _write_values(self, request: dict[Control, list[Any]]) -> None:
         payload: Payload = self._generate_write_payload(request)
 
         await self._post(
@@ -409,7 +409,7 @@ class HotWaterTankSection(BaseSection):
 
         modes: list[int | None] = [_mode if position == p else None for p in range(1, position + 1)]
 
-        await self._write_values(request={HotWaterTank.OPERATING_MODE: tuple(modes)})
+        await self._write_values(request={HotWaterTank.OPERATING_MODE: modes})
 
     async def get_lower_limit_temperature(self, position: int | None = 1) -> int:
         """Get lower limit temperature."""
@@ -447,7 +447,7 @@ class HotWaterTankSection(BaseSection):
     async def set_min_temperature(self, temperature: int, position: int = 1) -> None:
         """Set minimum temperature."""
         temperatures: list[float | None] = [temperature if position == p else None for p in range(1, position + 1)]
-        await self._write_values(request={HotWaterTank.MIN_TEMPERATURE: tuple(temperatures)})
+        await self._write_values(request={HotWaterTank.MIN_TEMPERATURE: temperatures})
 
     async def get_max_temperature(self, position: int | None = 1) -> float:
         """Get maximum temperature."""
@@ -463,7 +463,7 @@ class HotWaterTankSection(BaseSection):
     async def set_max_temperature(self, temperature: int, position: int = 1) -> None:
         """Set maximum temperature."""
         temperatures: list[float | None] = [temperature if position == p else None for p in range(1, position + 1)]
-        await self._write_values(request={HotWaterTank.MAX_TEMPERATURE: tuple(temperatures)})
+        await self._write_values(request={HotWaterTank.MAX_TEMPERATURE: temperatures})
 
 
 class HeatPumpSection(BaseSection):
@@ -654,7 +654,7 @@ class HeatCircuitSection(BaseSection):
     async def set_day_temperature(self, temperature: int, position: int = 1) -> None:
         """Set temperature."""
         temperatures: list[float | None] = [temperature if position == p else None for p in range(1, position + 1)]
-        await self._write_values(request={HeatCircuit.DAY_TEMPERATURE: tuple(temperatures)})
+        await self._write_values(request={HeatCircuit.DAY_TEMPERATURE: temperatures})
 
     async def get_day_temperature_threshold(self, position: int | None = 1) -> float:
         """Get day temperature threshold."""
@@ -681,7 +681,7 @@ class HeatCircuitSection(BaseSection):
     async def set_night_temperature(self, temperature: int, position: int = 1) -> None:
         """Set night temperature."""
         temperatures: list[float | None] = [temperature if position == p else None for p in range(1, position + 1)]
-        await self._write_values(request={HeatCircuit.NIGHT_TEMPERATURE: tuple(temperatures)})
+        await self._write_values(request={HeatCircuit.NIGHT_TEMPERATURE: temperatures})
 
     async def get_night_temperature_threshold(self, position: int | None = 1) -> float:
         """Get night temperature threshold."""
@@ -719,7 +719,7 @@ class HeatCircuitSection(BaseSection):
     async def set_offset_temperature(self, offset: float, position: int = 1) -> None:
         """Set offset temperature."""
         offsets: list[float | None] = [offset if position == p else None for p in range(1, position + 1)]
-        await self._write_values(request={HeatCircuit.OFFSET_TEMPERATURE: tuple(offsets)})
+        await self._write_values(request={HeatCircuit.OFFSET_TEMPERATURE: offsets})
 
     async def get_operating_mode(self, position: int | None = 1, *, human_readable: bool = True) -> int | str:
         """Get operating mode."""
@@ -749,4 +749,4 @@ class HeatCircuitSection(BaseSection):
 
         modes: list[int | None] = [_mode if position == p else None for p in range(1, position + 1)]
 
-        await self._write_values(request={HeatCircuit.OPERATING_MODE: tuple(modes)})
+        await self._write_values(request={HeatCircuit.OPERATING_MODE: modes})
