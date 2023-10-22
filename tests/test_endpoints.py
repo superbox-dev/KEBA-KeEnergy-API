@@ -463,7 +463,7 @@ class TestHotWaterTankSection:
     @pytest.mark.asyncio()
     @pytest.mark.parametrize(
         ("operating_mode", "expected_value"),
-        [("OFF", 0), (HotWaterTankOperatingMode.HEAT_UP.value, 3)],
+        [("off", 0), ("OFF", 0), (HotWaterTankOperatingMode.HEAT_UP.value, 3)],
     )
     async def test_set_operating_mode(
         self,
