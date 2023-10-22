@@ -48,7 +48,7 @@ class Position(NamedTuple):
 
 
 class Value(TypedDict, total=False):
-    value: str | float | int
+    value: Any
     attributes: dict[str, Any]
 
 
@@ -234,7 +234,7 @@ class BaseSection:
 
         return response
 
-    def _generate_write_payload(self, request: dict[Control, tuple[float | int | None, ...]]) -> Payload:
+    def _generate_write_payload(self, request: dict[Control, list[Any, ...]]) -> Payload:
         payload: Payload = []
 
         for control, values in request.items():
@@ -250,7 +250,7 @@ class BaseSection:
 
         return payload
 
-    async def _write_values(self, request: dict[Control, tuple[float | int | None, ...]]) -> None:
+    async def _write_values(self, request: dict[Control, list[Any, ...]]) -> None:
         payload: Payload = self._generate_write_payload(request)
 
         await self._post(

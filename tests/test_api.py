@@ -1,4 +1,5 @@
 import asyncio
+from typing import Any
 
 import pytest
 from aiohttp import ClientSession
@@ -764,7 +765,7 @@ class TestKebaKeEnergyAPI:
     )
     async def test_write_values(
         self,
-        control: dict[Control, tuple[float | int | None, ...]],
+        control: dict[Control, tuple[Any, ...]],
         expected_data: str,
     ) -> None:
         """Test write multiple values."""
