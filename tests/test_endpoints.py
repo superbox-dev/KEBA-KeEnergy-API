@@ -462,6 +462,55 @@ class TestHotWaterTankSection:
 
     @pytest.mark.asyncio()
     @pytest.mark.parametrize(
+        ("human_readable", "payload_value"),
+        [(True, 10)],
+    )
+    async def test_get_invalid_human_readable_operating_mode(
+        self,
+        human_readable: bool,  # noqa: FBT001
+        payload_value: int,
+    ) -> None:
+        """Test get invalid human readable operating mode for hot water tank."""
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/var/readWriteVars",
+                payload=[
+                    {
+                        "name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.operatingMode",
+                        "attributes": {
+                            "formatId": "fmtHotWaterTank",
+                            "longText": "Op.mode",
+                            "lowerLimit": "0",
+                            "unitId": "Enum",
+                            "upperLimit": "32767",
+                        },
+                        "value": f"{payload_value}",
+                    },
+                ],
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
+
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+
+            with pytest.raises(APIError) as error:
+                await client.hot_water_tank.get_operating_mode(human_readable=human_readable)
+
+            assert str(error.value) == (
+                "Can't convert value to human readable value! "
+                "{'name': 'APPL.CtrlAppl.sParam.hotWaterTank[0].param.operatingMode', "
+                "'attributes': {'formatId': 'fmtHotWaterTank', 'longText': 'Op.mode', "
+                "'lowerLimit': '0', 'unitId': 'Enum', 'upperLimit': '32767'}, 'value': '10'}"
+            )
+
+            mock_keenergy_api.assert_called_once_with(
+                url="http://mocked-host/var/readWriteVars",
+                data='[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].param.operatingMode", "attr": "1"}]',
+                method="POST",
+                ssl=False,
+            )
+
+    @pytest.mark.asyncio()
+    @pytest.mark.parametrize(
         ("operating_mode", "expected_value"),
         [("off", 0), ("OFF", 0), (HotWaterTankOperatingMode.HEAT_UP.value, 3)],
     )

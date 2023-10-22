@@ -163,11 +163,16 @@ class BaseSection:
     def _convert_value(control: Control, response: list[dict[str, Any]], *, human_readable: bool) -> float | int | str:
         value: float | int | str = control.value.data_type(response[0]["value"])
         value = round(value, 2) if isinstance(value, float) else value
-        return (
-            control.value.human_readable(value).name.lower()
-            if (human_readable and control.value.human_readable)
-            else value
-        )
+
+        if human_readable and control.value.human_readable:
+            try:
+                value = control.value.human_readable(value).name.lower()
+            except ValueError as error:
+                msg: str = f"Can't convert value to human readable value! {response[0]}"
+
+                raise APIError(msg) from error
+
+        return value
 
     @staticmethod
     def _clean_attributes(response: list[dict[str, Any]]) -> dict[str, Any]:

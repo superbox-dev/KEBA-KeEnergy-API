@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.8.1] - 2023-10-23
+
+## Added
+
+- Add APIError exception when can't convert value to human readable value.
+
+## Changed
+
+- Allow set operating mode in lower and uppercase.
+
 ## [1.8.0] - 2023-10-20
 
 ### Added
