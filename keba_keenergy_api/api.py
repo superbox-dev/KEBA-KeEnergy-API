@@ -1,11 +1,9 @@
 """Client to interact with KEBA KeEnergy API."""
-import asyncio
 from typing import Any
 
 from aiohttp import ClientSession
 
 from keba_keenergy_api.constants import Control
-from keba_keenergy_api.constants import HotWaterTank
 from keba_keenergy_api.constants import Outdoor
 from keba_keenergy_api.constants import SystemPrefix
 from keba_keenergy_api.endpoints import BaseSection
@@ -131,13 +129,3 @@ class KebaKeEnergyAPI(BaseSection):
         )
         _key: str = self._get_real_key(Outdoor.TEMPERATURE)
         return float(response[_key][0]["value"])
-
-
-async def main():
-    client = KebaKeEnergyAPI(host="hc.superbox.one", ssl=True)
-
-    print(await client.read_values_grouped_by_section(request=[HotWaterTank.OPERATING_MODE]))
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
