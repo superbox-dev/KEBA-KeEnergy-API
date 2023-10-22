@@ -737,8 +737,8 @@ class HeatCircuitSection(BaseSection):
     async def set_operating_mode(self, mode: int | str, position: int = 1) -> None:
         """Set operating mode."""
         try:
-            _mode: int | None = mode if isinstance(mode, int) else getattr(HeatCircuitOperatingMode, mode).value
-        except AttributeError as error:
+            _mode: int | None = mode if isinstance(mode, int) else HeatCircuitOperatingMode[mode.upper()].value
+        except KeyError as error:
             msg: str = "Invalid operating mode!"
             raise APIError(msg) from error
 
