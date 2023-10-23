@@ -140,6 +140,7 @@ asyncio.run(main())
 | `.set_night_temperature(16, position)`          | `float`        | Set night temperature.                              |
 | `.get_night_temperature_threshold(position)`    | `float`        | Get night temperature threshold.                    |
 | `.get_holiday_temperature(position)`            | `float`        | Get holiday temperature.                            |
+| `.set_holiday_temperature(14, position)`        | `float`        | Set holiday temperature.                            |
 | `.get_offset_temperature(position)`             | `float`        | Get offset temperature.                             |
 | `.set_offset_temperature(2, position)`          | `float`        | Set offset temperature.                             |
 | `.get_operating_mode(position, human_readable)` | `int` or `str` | Get operating mode (0 is `OFF` and 3 is `HEAT_UP`). |

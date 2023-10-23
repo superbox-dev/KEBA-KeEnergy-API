@@ -21,10 +21,6 @@ class HotWaterTankOperatingMode(IntEnum):
     ON: Final[int] = 2
     HEAT_UP: Final[int] = 3
 
-    @classmethod
-    def _missing_(cls, value: int):
-        return cls(cls.OFF)
-
 
 class HeatPumpStatus(IntEnum):
     STANDBY: Final[int] = 0
@@ -40,10 +36,6 @@ class HeatCircuitOperatingMode(IntEnum):
     NIGHT: Final[int] = 3
     AWAY: Final[int] = 4
     PARTY: Final[int] = 5
-
-    @classmethod
-    def _missing_(cls, value: int):
-        return cls(cls.OFF)
 
 
 OPTIONS_PREFIX: Final[str] = "APPL.CtrlAppl.sParam.options"
@@ -113,7 +105,7 @@ class HeatCircuit(Enum):
     DAY_TEMPERATURE_THRESHOLD: Final[ControlValue] = ControlValue("param.thresholdDayTemp.value", float)
     NIGHT_TEMPERATURE: Final[ControlValue] = ControlValue("param.reducedSetTemp", float, read_only=False)
     NIGHT_TEMPERATURE_THRESHOLD: Final[ControlValue] = ControlValue("param.thresholdNightTemp.value", float)
-    HOLIDAY_TEMPERATURE: Final[ControlValue] = ControlValue("param.holidaySetTemp", float)
+    HOLIDAY_TEMPERATURE: Final[ControlValue] = ControlValue("param.holidaySetTemp", float, read_only=False)
     OFFSET_TEMPERATURE: Final[ControlValue] = ControlValue("param.offsetRoomTemp", float, read_only=False)
     OPERATING_MODE: Final[ControlValue] = ControlValue(
         "param.operatingMode",

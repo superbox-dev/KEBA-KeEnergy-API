@@ -705,6 +705,11 @@ class HeatCircuitSection(BaseSection):
         _key: str = self._get_real_key(HeatCircuit.HOLIDAY_TEMPERATURE)
         return float(response[_key][_idx]["value"])
 
+    async def set_holiday_temperature(self, temperature: int, position: int = 1) -> None:
+        """Set holiday temperature."""
+        temperatures: list[float | None] = [temperature if position == p else None for p in range(1, position + 1)]
+        await self._write_values(request={HeatCircuit.HOLIDAY_TEMPERATURE: temperatures})
+
     async def get_offset_temperature(self, position: int | None = 1) -> float:
         """Get offset temperature."""
         response: ValueResponse = await self._read_values(

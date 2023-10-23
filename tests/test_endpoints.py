@@ -1443,6 +1443,26 @@ class TestHeatCircuitSection:
             )
 
     @pytest.mark.asyncio()
+    async def test_set_holiday_temperature(self) -> None:
+        """Test set holiday temperature for heat circuit."""
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/var/readWriteVars?action=set",
+                payload={},
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
+
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+            await client.heat_circuit.set_holiday_temperature(14)
+
+            mock_keenergy_api.assert_called_once_with(
+                url="http://mocked-host/var/readWriteVars?action=set",
+                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.holidaySetTemp", "value": "14"}]',
+                method="POST",
+                ssl=False,
+            )
+
+    @pytest.mark.asyncio()
     async def test_get_offset_temperature(self) -> None:
         """Test get offset temperature for heat circuit."""
         with aioresponses() as mock_keenergy_api:
