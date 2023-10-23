@@ -21,11 +21,16 @@ class HotWaterTankOperatingMode(IntEnum):
     ON: Final[int] = 2
     HEAT_UP: Final[int] = 3
 
+    @classmethod
+    def _missing_(cls, value: int):
+        return cls(cls.OFF)
+
 
 class HeatPumpStatus(IntEnum):
     STANDBY: Final[int] = 0
     FLOW: Final[int] = 1
     AUTO: Final[int] = 2
+    INFLOW: Final[int] = 5
 
 
 class HeatCircuitOperatingMode(IntEnum):
@@ -35,6 +40,10 @@ class HeatCircuitOperatingMode(IntEnum):
     NIGHT: Final[int] = 3
     AWAY: Final[int] = 4
     PARTY: Final[int] = 5
+
+    @classmethod
+    def _missing_(cls, value: int):
+        return cls(cls.OFF)
 
 
 OPTIONS_PREFIX: Final[str] = "APPL.CtrlAppl.sParam.options"
