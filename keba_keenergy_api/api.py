@@ -95,24 +95,24 @@ class KebaKeEnergyAPI(BaseSection):
         )
 
         data: dict[str, ValueResponse] = {
-            SystemPrefix.OUTDOOR[0:-1]: {},
-            SystemPrefix.OPTIONS[0:-1]: {},
-            SystemPrefix.HOT_WATER_TANK[0:-1]: {},
-            SystemPrefix.HEAT_PUMP[0:-1]: {},
-            SystemPrefix.HEAT_CIRCUIT[0:-1]: {},
+            SystemPrefix.OUTDOOR: {},
+            SystemPrefix.OPTIONS: {},
+            SystemPrefix.HOT_WATER_TANK: {},
+            SystemPrefix.HEAT_PUMP: {},
+            SystemPrefix.HEAT_CIRCUIT: {},
         }
 
         for key, value in response.items():
             if key.startswith(SystemPrefix.OUTDOOR):
-                data[SystemPrefix.OUTDOOR[0:-1]][key.lower()] = value
+                data[SystemPrefix.OUTDOOR][key.lower()] = value
             elif key.startswith(SystemPrefix.OPTIONS):
-                data[SystemPrefix.OPTIONS[0:-1]][key.lower()] = value
+                data[SystemPrefix.OPTIONS][key.lower()] = value
             elif key.startswith(SystemPrefix.HOT_WATER_TANK):
-                data[SystemPrefix.HOT_WATER_TANK[0:-1]][key.lower()] = value
+                data[SystemPrefix.HOT_WATER_TANK][key.lower()] = value
             elif key.startswith(SystemPrefix.HEAT_PUMP):
-                data[SystemPrefix.HEAT_PUMP[0:-1]][key.lower()] = value
+                data[SystemPrefix.HEAT_PUMP][key.lower()] = value
             elif key.startswith(SystemPrefix.HEAT_CIRCUIT):
-                data[SystemPrefix.HEAT_CIRCUIT[0:-1]][key.lower()] = value
+                data[SystemPrefix.HEAT_CIRCUIT][key.lower()] = value
 
         return data
 
