@@ -118,11 +118,11 @@ class HeatCircuit(Enum):
 class SystemPrefix(str, Enum):
     """System prefixes."""
 
-    OPTIONS: Final[str] = "OPTIONS_"
-    OUTDOOR: Final[str] = "OUTDOOR_"
-    HOT_WATER_TANK: Final[str] = "HOT_WATER_TANK_"
-    HEAT_PUMP: Final[str] = "HEAT_PUMP_"
-    HEAT_CIRCUIT = "HEAT_CIRCUIT_"
+    OPTIONS: Final[str] = "OPTIONS"
+    OUTDOOR: Final[str] = "OUTDOOR"
+    HOT_WATER_TANK: Final[str] = "HOT_WATER_TANK"
+    HEAT_PUMP: Final[str] = "HEAT_PUMP"
+    HEAT_CIRCUIT = "HEAT_CIRCUIT"
 
 
 Control: TypeAlias = Options | Outdoor | HotWaterTank | HeatPump | HeatCircuit
