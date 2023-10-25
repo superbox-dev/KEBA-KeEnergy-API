@@ -95,11 +95,11 @@ class KebaKeEnergyAPI(BaseSection):
         )
 
         data: dict[str, ValueResponse] = {
-            SystemPrefix.OUTDOOR: {},
-            SystemPrefix.OPTIONS: {},
-            SystemPrefix.HOT_WATER_TANK: {},
-            SystemPrefix.HEAT_PUMP: {},
-            SystemPrefix.HEAT_CIRCUIT: {},
+            SystemPrefix.OUTDOOR.name: {},
+            SystemPrefix.OPTIONS.name: {},
+            SystemPrefix.HOT_WATER_TANK.name: {},
+            SystemPrefix.HEAT_PUMP.name: {},
+            SystemPrefix.HEAT_CIRCUIT.name: {},
         }
 
         for key, value in response.items():
