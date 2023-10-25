@@ -38,6 +38,22 @@ class HeatCircuitOperatingMode(IntEnum):
     PARTY: Final[int] = 5
 
 
+class HotWaterTankHeatRequest(str, Enum):
+    OFF: Final[str] = "false"
+    ON: Final[str] = "true"
+
+
+class HeatPumpHeatRequest(str, Enum):
+    OFF: Final[str] = "false"
+    ON: Final[str] = "true"
+
+
+class HeatCircuitHeatRequest(str, Enum):
+    OFF: Final[str] = "0"
+    ON: Final[str] = "1"
+    TEMPORARY_OFF: Final[str] = "3"
+
+
 OPTIONS_PREFIX: Final[str] = "APPL.CtrlAppl.sParam.options"
 OUTDOOR_PREFIX: Final[str] = "APPL.CtrlAppl.sParam.outdoorTemp"
 HOT_WATER_TANK_PREFIX: Final[str] = "APPL.CtrlAppl.sParam.hotWaterTank"
@@ -49,7 +65,7 @@ class ControlValue(NamedTuple):
     value: str
     data_type: type[float | int | str]
     read_only: bool = True
-    human_readable: type[IntEnum] | None = None
+    human_readable: type[Enum] | None = None
 
 
 class Options(Enum):
@@ -76,6 +92,12 @@ class HotWaterTank(Enum):
         read_only=False,
     )
     MAX_TEMPERATURE: Final[ControlValue] = ControlValue("param.normalSetTempMax.value", float, read_only=False)
+    HEAT_REQUEST: Final[ControlValue] = ControlValue(
+        "values.heatRequestTop",
+        str,
+        read_only=False,
+        human_readable=HotWaterTankHeatRequest,
+    )
 
 
 class HeatPump(Enum):
@@ -96,6 +118,12 @@ class HeatPump(Enum):
     COMPRESSOR: Final[ControlValue] = ControlValue("Compressor.values.setValueScaled", float)
     HIGH_PRESSURE: Final[ControlValue] = ControlValue("HighPressure.values.actValue", float)
     LOW_PRESSURE: Final[ControlValue] = ControlValue("LowPressure.values.actValue", float)
+    HEAT_REQUEST: Final[ControlValue] = ControlValue(
+        "values.request",
+        str,
+        read_only=False,
+        human_readable=HeatPumpHeatRequest,
+    )
 
 
 class HeatCircuit(Enum):
@@ -107,6 +135,12 @@ class HeatCircuit(Enum):
     NIGHT_TEMPERATURE_THRESHOLD: Final[ControlValue] = ControlValue("param.thresholdNightTemp.value", float)
     HOLIDAY_TEMPERATURE: Final[ControlValue] = ControlValue("param.holidaySetTemp", float, read_only=False)
     OFFSET_TEMPERATURE: Final[ControlValue] = ControlValue("param.offsetRoomTemp", float, read_only=False)
+    HEAT_REQUEST: Final[ControlValue] = ControlValue(
+        "values.heatRequest",
+        str,
+        read_only=False,
+        human_readable=HeatCircuitHeatRequest,
+    )
     OPERATING_MODE: Final[ControlValue] = ControlValue(
         "param.operatingMode",
         int,

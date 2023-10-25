@@ -465,6 +465,23 @@ class HotWaterTankSection(BaseSection):
         temperatures: list[float | None] = [temperature if position == p else None for p in range(1, position + 1)]
         await self._write_values(request={HotWaterTank.MAX_TEMPERATURE: temperatures})
 
+    async def get_heat_request(self, position: int | None = 1, *, human_readable: bool = True) -> int | str:
+        """Get heat request."""
+        response: ValueResponse = await self._read_values(
+            request=HotWaterTank.HEAT_REQUEST,
+            position=position,
+            human_readable=human_readable,
+            extra_attributes=True,
+        )
+        _idx: int = position - 1 if position else 0
+        _key: str = self._get_real_key(HotWaterTank.HEAT_REQUEST)
+        _value: int | str = str(response[_key][_idx]["value"])
+
+        if _value in ["true", "false"]:
+            _value = 1 if _value == "true" else 0
+
+        return _value
+
 
 class HeatPumpSection(BaseSection):
     """Class to retrieve the heat pump data."""
@@ -611,6 +628,23 @@ class HeatPumpSection(BaseSection):
         _key: str = self._get_real_key(HeatPump.LOW_PRESSURE)
         return float(response[_key][_idx]["value"])
 
+    async def get_heat_request(self, position: int | None = 1, *, human_readable: bool = True) -> int | str:
+        """Get heat request."""
+        response: ValueResponse = await self._read_values(
+            request=HeatPump.HEAT_REQUEST,
+            position=position,
+            human_readable=human_readable,
+            extra_attributes=True,
+        )
+        _idx: int = position - 1 if position else 0
+        _key: str = self._get_real_key(HeatPump.HEAT_REQUEST)
+        _value: int | str = str(response[_key][_idx]["value"])
+
+        if _value in ["true", "false"]:
+            _value = 1 if _value == "true" else 0
+
+        return _value
+
 
 class HeatCircuitSection(BaseSection):
     """Class to send and retrieve the heat pump data."""
@@ -755,3 +789,21 @@ class HeatCircuitSection(BaseSection):
         modes: list[int | None] = [_mode if position == p else None for p in range(1, position + 1)]
 
         await self._write_values(request={HeatCircuit.OPERATING_MODE: modes})
+
+    async def get_heat_request(self, position: int | None = 1, *, human_readable: bool = True) -> int | str:
+        """Get heat request."""
+        response: ValueResponse = await self._read_values(
+            request=HeatCircuit.HEAT_REQUEST,
+            position=position,
+            human_readable=human_readable,
+            extra_attributes=True,
+        )
+        _idx: int = position - 1 if position else 0
+        _key: str = self._get_real_key(HeatCircuit.HEAT_REQUEST)
+
+        try:
+            _value: int | str = int(response[_key][_idx]["value"])
+        except ValueError:
+            _value = str(response[_key][_idx]["value"])
+
+        return _value

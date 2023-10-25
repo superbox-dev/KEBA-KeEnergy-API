@@ -110,6 +110,7 @@ asyncio.run(main())
 | `.set_min_temperature(20, position)`               | `float`          | Set minimum temperature.                                                             |
 | `.get_max_temperature(position)`                   | `float`          | Get maximum temperature.                                                             |
 | `.set_max_temperature(22, position)`               | `float`          | Set maximum temperature.                                                             |
+| `.get_heat_request(position)`                      | `int` or `str`   | Get heat request.                                                                    |
 
 ### Heat pump
 
@@ -127,6 +128,7 @@ asyncio.run(main())
 | `.get_compressor(position)`                    | `float`        | Get compressor in percent.                                                  |
 | `.get_high_pressure(position)`                 | `float`        | Get high pressure.                                                          |
 | `.get_low_pressure(position)`                  | `float`        | Get low pressure.                                                           |
+| `.get_heat_request(position)`                  | `int` or `str` | Get heat request.                                                           |
 
 ### Heat circuit
 
@@ -145,6 +147,7 @@ asyncio.run(main())
 | `.set_offset_temperature(2, position)`          | `float`        | Set offset temperature.                             |
 | `.get_operating_mode(position, human_readable)` | `int` or `str` | Get operating mode (0 is `OFF` and 3 is `HEAT_UP`). |
 | `.set_operating_mode(3, position)`              | `int` or `str` | Set operating mode.                                 |
+| `.get_heat_request(position)`                   | `int` or `str` | Get heat request.                                   |
 
 ## Changelog
 

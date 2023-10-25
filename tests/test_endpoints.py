@@ -4,7 +4,10 @@ import pytest
 from aioresponses.core import aioresponses
 
 from keba_keenergy_api.api import KebaKeEnergyAPI
+from keba_keenergy_api.constants import HeatCircuitHeatRequest
 from keba_keenergy_api.constants import HeatCircuitOperatingMode
+from keba_keenergy_api.constants import HeatPumpHeatRequest
+from keba_keenergy_api.constants import HotWaterTankHeatRequest
 from keba_keenergy_api.constants import HotWaterTankOperatingMode
 from keba_keenergy_api.endpoints import Position
 from keba_keenergy_api.error import APIError
@@ -748,6 +751,49 @@ class TestHotWaterTankSection:
                 ssl=False,
             )
 
+    @pytest.mark.asyncio()
+    @pytest.mark.parametrize(
+        ("human_readable", "payload_value", "expected_value"),
+        [
+            (True, "true", "on"),
+            (False, HotWaterTankHeatRequest.ON.value, 1),
+            (True, "false", "off"),
+            (False, HotWaterTankHeatRequest.OFF.value, 0),
+        ],
+    )
+    async def test_get_heat_request(
+        self,
+        human_readable: bool,  # noqa: FBT001
+        payload_value: str,
+        expected_value: str,
+    ) -> None:
+        """Test get heat request for hot water tank."""
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/var/readWriteVars",
+                payload=[
+                    {
+                        "name": "APPL.CtrlAppl.sParam.hotWaterTank[0].values.heatRequestTop",
+                        "attributes": {},
+                        "value": payload_value,
+                    },
+                ],
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
+
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+            data: int | str = await client.hot_water_tank.get_heat_request(human_readable=human_readable)
+
+            assert isinstance(data, (int | str))
+            assert data == expected_value
+
+            mock_keenergy_api.assert_called_once_with(
+                url="http://mocked-host/var/readWriteVars",
+                data='[{"name": "APPL.CtrlAppl.sParam.hotWaterTank[0].values.heatRequestTop", "attr": "1"}]',
+                method="POST",
+                ssl=False,
+            )
+
 
 class TestHeatPumpSection:
     @pytest.mark.asyncio()
@@ -1155,6 +1201,49 @@ class TestHeatPumpSection:
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
                 data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].LowPressure.values.actValue", "attr": "1"}]',
+                method="POST",
+                ssl=False,
+            )
+
+    @pytest.mark.asyncio()
+    @pytest.mark.parametrize(
+        ("human_readable", "payload_value", "expected_value"),
+        [
+            (True, "true", "on"),
+            (False, HeatPumpHeatRequest.ON.value, 1),
+            (True, "false", "off"),
+            (False, HeatPumpHeatRequest.OFF.value, 0),
+        ],
+    )
+    async def test_get_heat_request(
+        self,
+        human_readable: bool,  # noqa: FBT001
+        payload_value: str,
+        expected_value: str,
+    ) -> None:
+        """Test get heat request for heat pump."""
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/var/readWriteVars",
+                payload=[
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatpump[0].values.request",
+                        "attributes": {},
+                        "value": payload_value,
+                    },
+                ],
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
+
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+            data: int | str = await client.heat_pump.get_heat_request(human_readable=human_readable)
+
+            assert isinstance(data, (int | str))
+            assert data == expected_value
+
+            mock_keenergy_api.assert_called_once_with(
+                url="http://mocked-host/var/readWriteVars",
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].values.request", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
@@ -1620,3 +1709,98 @@ class TestHeatCircuitSection:
             assert str(error.value) == "Invalid operating mode!"
 
             mock_keenergy_api.assert_not_called()
+
+    @pytest.mark.asyncio()
+    @pytest.mark.parametrize(
+        ("human_readable", "payload_value", "expected_value"),
+        [
+            (True, "1", "on"),
+            (False, HeatCircuitHeatRequest.ON.value, 1),
+            (True, "0", "off"),
+            (False, HeatCircuitHeatRequest.OFF.value, 0),
+            (True, "3", "temporary_off"),
+            (False, HeatCircuitHeatRequest.TEMPORARY_OFF.value, 3),
+        ],
+    )
+    async def test_get_heat_request(
+        self,
+        human_readable: bool,  # noqa: FBT001
+        payload_value: str,
+        expected_value: str,
+    ) -> None:
+        """Test get heat request for heat circuit."""
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/var/readWriteVars",
+                payload=[
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.heatRequest",
+                        "attributes": {
+                            "unitId": "Enum",
+                            "upperLimit": "6",
+                            "lowerLimit": "0",
+                        },
+                        "value": payload_value,
+                    },
+                ],
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
+
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+            data: int | str = await client.heat_circuit.get_heat_request(human_readable=human_readable)
+
+            assert isinstance(data, (int | str))
+            assert data == expected_value
+
+            mock_keenergy_api.assert_called_once_with(
+                url="http://mocked-host/var/readWriteVars",
+                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.heatRequest", "attr": "1"}]',
+                method="POST",
+                ssl=False,
+            )
+
+    @pytest.mark.asyncio()
+    @pytest.mark.parametrize(
+        ("human_readable", "payload_value"),
+        [(True, "16")],
+    )
+    async def test_get_invalid_heat_request(
+        self,
+        human_readable: bool,  # noqa: FBT001
+        payload_value: str,
+    ) -> None:
+        """Test get heat request for heat circuit."""
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/var/readWriteVars",
+                payload=[
+                    {
+                        "name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.heatRequest",
+                        "attributes": {
+                            "unitId": "Enum",
+                            "upperLimit": "6",
+                            "lowerLimit": "0",
+                        },
+                        "value": payload_value,
+                    },
+                ],
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
+
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+
+            with pytest.raises(APIError) as error:
+                await client.heat_circuit.get_heat_request(human_readable=human_readable)
+
+            assert str(error.value) == (
+                "Can't convert value to human readable value! "
+                "{'name': 'APPL.CtrlAppl.sParam.heatCircuit[0].values.heatRequest', "
+                "'attributes': {'unitId': 'Enum', 'upperLimit': '6', 'lowerLimit': '0'}, 'value': '16'}"
+            )
+
+            mock_keenergy_api.assert_called_once_with(
+                url="http://mocked-host/var/readWriteVars",
+                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.heatRequest", "attr": "1"}]',
+                method="POST",
+                ssl=False,
+            )

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.11.0] - 2023-10-25
+
+## Added
+
+- Added `heat_pump.get_heat_request()` endpoint.
+- Added `heat_circuit.get_heat_request()` endpoint.
+- Added `hot_water_tank.get_heat_request()` endpoint.
+
 ## [1.10.1] - 2023-10-24
 
 ## Changed 
