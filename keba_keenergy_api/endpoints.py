@@ -180,7 +180,7 @@ class BaseSection:
         converted_attributes: dict[str, Any] = {}
         re_pattern: Pattern[str] = re.compile(r"(?<!^)(?=[A-Z])")
 
-        for attr_key, attr_value in attributes.items():
+        for attr_key in attributes:
             if attr_key not in ["longText", "formatId", "dynLowerLimit", "dynUpperLimit"]:
                 new_attr_key: str = re_pattern.sub("_", attr_key).lower()
                 converted_attributes[new_attr_key] = attributes[attr_key]
