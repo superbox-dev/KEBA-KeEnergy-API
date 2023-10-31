@@ -7,15 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Convert attributes keys to lower case
+
 ## [1.11.1] - 2023-10-25
 
-## Fixed
+### Fixed
 
 - Fixed response keys from `read_values_grouped_by_section()`.
 
 ## [1.11.0] - 2023-10-25
 
-## Added
+### Added
 
 - Added `heat_pump.get_heat_request()` endpoint.
 - Added `heat_circuit.get_heat_request()` endpoint.
@@ -23,30 +27,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.10.1] - 2023-10-24
 
-## Changed 
+### Changed 
 
 - Refactor `SystemPrefix` enum variables.
 
 ## [1.10.0] - 2023-10-23
 
-## Added
+### Added
 
 - Added heat pump state "inflow"
 - Added `heat_circuit.set_holiday_temperature()` endpoint
 
 ## [1.9.0] - 2023-10-23
 
-## Added
+### Added
 
 - Add **AWAY** and **PARTY** to heat circuit operating mode
 
 ## [1.8.1] - 2023-10-22
 
-## Added
+### Added
 
 - Add APIError exception when can't convert value to human readable value.
 
-## Changed
+### Changed
 
 - Allow set operating mode in lower and uppercase.
 

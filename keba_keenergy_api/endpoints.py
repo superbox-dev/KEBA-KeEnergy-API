@@ -177,12 +177,15 @@ class BaseSection:
     @staticmethod
     def _clean_attributes(response: list[dict[str, Any]]) -> dict[str, Any]:
         attributes: dict[str, Any] = response[0].get("attributes", {})
+        converted_attributes: dict[str, Any] = {}
+        re_pattern: Pattern[str] = re.compile(r"(?<!^)(?=[A-Z])")
 
-        for attr_key in ["longText", "formatId", "dynLowerLimit", "dynUpperLimit"]:
-            if attributes.get(attr_key):
-                del attributes[attr_key]
+        for attr_key, attr_value in attributes.items():
+            if attr_key not in ["longText", "formatId", "dynLowerLimit", "dynUpperLimit"]:
+                new_attr_key: str = re_pattern.sub("_", attr_key).lower()
+                converted_attributes[new_attr_key] = attributes[attr_key]
 
-        return attributes
+        return converted_attributes
 
     async def _read_values(
         self,
@@ -420,7 +423,7 @@ class HotWaterTankSection(BaseSection):
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HotWaterTank.MAX_TEMPERATURE)
-        return int(response[_key][_idx]["attributes"]["lowerLimit"])
+        return int(response[_key][_idx]["attributes"]["lower_limit"])
 
     async def get_upper_limit_temperature(self, position: int | None = 1) -> int:
         """Get uper limit temperature."""
@@ -431,7 +434,7 @@ class HotWaterTankSection(BaseSection):
         )
         _idx: int = position - 1 if position else 0
         _key: str = self._get_real_key(HotWaterTank.MAX_TEMPERATURE)
-        return int(response[_key][_idx]["attributes"]["upperLimit"])
+        return int(response[_key][_idx]["attributes"]["upper_limit"])
 
     async def get_min_temperature(self, position: int | None = 1) -> float:
         """Get minimum temperature."""

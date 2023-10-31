@@ -126,9 +126,9 @@ class TestKebaKeEnergyAPI:
                         {
                             "value": 10.81,
                             "attributes": {
-                                "lowerLimit": "10",
-                                "unitId": "Temp",
-                                "upperLimit": "90",
+                                "lower_limit": "10",
+                                "unit_id": "Temp",
+                                "upper_limit": "90",
                             },
                         },
                     ],
@@ -191,17 +191,17 @@ class TestKebaKeEnergyAPI:
                         {
                             "value": 10.81,
                             "attributes": {
-                                "lowerLimit": "10",
-                                "unitId": "Temp",
-                                "upperLimit": "90",
+                                "lower_limit": "10",
+                                "unit_id": "Temp",
+                                "upper_limit": "90",
                             },
                         },
                         {
                             "value": 11.81,
                             "attributes": {
-                                "lowerLimit": "10",
-                                "unitId": "Temp",
-                                "upperLimit": "90",
+                                "lower_limit": "10",
+                                "unit_id": "Temp",
+                                "upper_limit": "90",
                             },
                         },
                     ],
@@ -209,13 +209,13 @@ class TestKebaKeEnergyAPI:
                         {
                             "value": 24.2,
                             "attributes": {
-                                "unitId": "Temp",
+                                "unit_id": "Temp",
                             },
                         },
                         {
                             "value": 23.2,
                             "attributes": {
-                                "unitId": "Temp",
+                                "unit_id": "Temp",
                             },
                         },
                     ],
@@ -315,9 +315,9 @@ class TestKebaKeEnergyAPI:
                         {
                             "value": 17.54,
                             "attributes": {
-                                "lowerLimit": "-100",
-                                "unitId": "Temp",
-                                "upperLimit": "100",
+                                "lower_limit": "-100",
+                                "unit_id": "Temp",
+                                "upper_limit": "100",
                             },
                         },
                     ],
@@ -325,9 +325,9 @@ class TestKebaKeEnergyAPI:
                         {
                             "value": 10.81,
                             "attributes": {
-                                "lowerLimit": "10",
-                                "unitId": "Temp",
-                                "upperLimit": "90",
+                                "lower_limit": "10",
+                                "unit_id": "Temp",
+                                "upper_limit": "90",
                             },
                         },
                     ],
@@ -335,13 +335,13 @@ class TestKebaKeEnergyAPI:
                         {
                             "value": 24.2,
                             "attributes": {
-                                "unitId": "Temp",
+                                "unit_id": "Temp",
                             },
                         },
                         {
                             "value": 23.2,
                             "attributes": {
-                                "unitId": "Temp",
+                                "unit_id": "Temp",
                             },
                         },
                     ],
@@ -439,8 +439,8 @@ class TestKebaKeEnergyAPI:
                         "options_hot_water_tank_numbers": [
                             {
                                 "attributes": {
-                                    "lowerLimit": "0",
-                                    "upperLimit": "4",
+                                    "lower_limit": "0",
+                                    "upper_limit": "4",
                                 },
                                 "value": 2,
                             },
@@ -451,9 +451,9 @@ class TestKebaKeEnergyAPI:
                             {
                                 "value": 40.81,
                                 "attributes": {
-                                    "lowerLimit": "20",
-                                    "unitId": "Temp",
-                                    "upperLimit": "90",
+                                    "lower_limit": "20",
+                                    "unit_id": "Temp",
+                                    "upper_limit": "90",
                                 },
                             },
                         ],
@@ -523,17 +523,17 @@ class TestKebaKeEnergyAPI:
                             {
                                 "value": 10.81,
                                 "attributes": {
-                                    "lowerLimit": "10",
-                                    "unitId": "Temp",
-                                    "upperLimit": "90",
+                                    "lower_limit": "10",
+                                    "unit_id": "Temp",
+                                    "upper_limit": "90",
                                 },
                             },
                             {
                                 "value": 11.81,
                                 "attributes": {
-                                    "lowerLimit": "10",
-                                    "unitId": "Temp",
-                                    "upperLimit": "90",
+                                    "lower_limit": "10",
+                                    "unit_id": "Temp",
+                                    "upper_limit": "90",
                                 },
                             },
                         ],
@@ -543,13 +543,13 @@ class TestKebaKeEnergyAPI:
                             {
                                 "value": 24.2,
                                 "attributes": {
-                                    "unitId": "Temp",
+                                    "unit_id": "Temp",
                                 },
                             },
                             {
                                 "value": 23.2,
                                 "attributes": {
-                                    "unitId": "Temp",
+                                    "unit_id": "Temp",
                                 },
                             },
                         ],
@@ -651,9 +651,9 @@ class TestKebaKeEnergyAPI:
                             {
                                 "value": 17.54,
                                 "attributes": {
-                                    "lowerLimit": "-100",
-                                    "unitId": "Temp",
-                                    "upperLimit": "100",
+                                    "lower_limit": "-100",
+                                    "unit_id": "Temp",
+                                    "upper_limit": "100",
                                 },
                             },
                         ],
@@ -665,13 +665,13 @@ class TestKebaKeEnergyAPI:
                             {
                                 "value": 24.2,
                                 "attributes": {
-                                    "unitId": "Temp",
+                                    "unit_id": "Temp",
                                 },
                             },
                             {
                                 "value": 23.2,
                                 "attributes": {
-                                    "unitId": "Temp",
+                                    "unit_id": "Temp",
                                 },
                             },
                         ],
@@ -681,9 +681,9 @@ class TestKebaKeEnergyAPI:
                             {
                                 "value": 10.81,
                                 "attributes": {
-                                    "lowerLimit": "10",
-                                    "unitId": "Temp",
-                                    "upperLimit": "90",
+                                    "lower_limit": "10",
+                                    "unit_id": "Temp",
+                                    "upper_limit": "90",
                                 },
                             },
                         ],
