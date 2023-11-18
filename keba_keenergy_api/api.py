@@ -4,15 +4,6 @@ from typing import Any
 
 from aiohttp import ClientSession
 
-from keba_keenergy_api.constants import Control
-from keba_keenergy_api.constants import Outdoor
-from keba_keenergy_api.constants import SystemPrefix
-from keba_keenergy_api.endpoints import BaseSection
-from keba_keenergy_api.endpoints import DeviceSection
-from keba_keenergy_api.endpoints import HeatCircuitSection
-from keba_keenergy_api.endpoints import HeatPumpSection
-from keba_keenergy_api.endpoints import HotWaterTankSection
-from keba_keenergy_api.endpoints import OptionsSection
 from keba_keenergy_api.constants import Section
 from keba_keenergy_api.constants import SectionPrefix
 from keba_keenergy_api.endpoints import BaseEndpoints

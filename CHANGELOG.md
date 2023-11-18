@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.12] - 2023-11-18
+
 ### Added
 
 - Added `system.get_operation_mode()` endpoint.
