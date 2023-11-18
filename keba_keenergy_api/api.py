@@ -101,13 +101,3 @@ class KebaKeEnergyAPI(BaseEndpoints):
     async def write_data(self, request: dict[Section, list[Any]]) -> None:
         """Write multiple data to API with one request."""
         await self._write_values(request=request)
-
-    async def get_outdoor_temperature(self) -> float:
-        """Get outdoor temperature."""
-        response: dict[str, Any] = await self._read_values(
-            request=Outdoor.TEMPERATURE,
-            position=None,
-            extra_attributes=True,
-        )
-        _key: str = self._get_real_key(Outdoor.TEMPERATURE)
-        return float(response[_key][0]["value"])
