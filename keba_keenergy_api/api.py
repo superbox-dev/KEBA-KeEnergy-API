@@ -1,4 +1,5 @@
 """Client to interact with KEBA KeEnergy API."""
+import asyncio
 from typing import Any
 
 from aiohttp import ClientSession
@@ -12,11 +13,19 @@ from keba_keenergy_api.endpoints import HeatCircuitSection
 from keba_keenergy_api.endpoints import HeatPumpSection
 from keba_keenergy_api.endpoints import HotWaterTankSection
 from keba_keenergy_api.endpoints import OptionsSection
+from keba_keenergy_api.constants import Section
+from keba_keenergy_api.constants import SectionPrefix
+from keba_keenergy_api.endpoints import BaseEndpoints
+from keba_keenergy_api.endpoints import HeatCircuitEndpoints
+from keba_keenergy_api.endpoints import HeatPumpEndpoints
+from keba_keenergy_api.endpoints import HotWaterTankEndpoints
 from keba_keenergy_api.endpoints import Position
+from keba_keenergy_api.endpoints import SystemEndpoints
+from keba_keenergy_api.endpoints import Value
 from keba_keenergy_api.endpoints import ValueResponse
 
 
-class KebaKeEnergyAPI(BaseSection):
+class KebaKeEnergyAPI(BaseEndpoints):
     """Client to interact with KEBA KeEnergy API."""
 
     def __init__(self, host: str, *, ssl: bool = False, session: ClientSession | None = None) -> None:
@@ -35,59 +44,38 @@ class KebaKeEnergyAPI(BaseSection):
         return f"{self.schema}://{self.host}"
 
     @property
-    def device(self) -> DeviceSection:
-        """Get device endpoints."""
-        return DeviceSection(base_url=self.device_url, ssl=self.ssl, session=self.session)
+    def system(self) -> SystemEndpoints:
+        """Get system endpoints."""
+        return SystemEndpoints(base_url=self.device_url, ssl=self.ssl, session=self.session)
 
     @property
-    def options(self) -> OptionsSection:
-        """Get options endpoints."""
-        return OptionsSection(base_url=self.device_url, ssl=self.ssl, session=self.session)
-
-    @property
-    def hot_water_tank(self) -> HotWaterTankSection:
+    def hot_water_tank(self) -> HotWaterTankEndpoints:
         """Get hot water tank endpoints."""
-        return HotWaterTankSection(base_url=self.device_url, ssl=self.ssl, session=self.session)
+        return HotWaterTankEndpoints(base_url=self.device_url, ssl=self.ssl, session=self.session)
 
     @property
-    def heat_pump(self) -> HeatPumpSection:
+    def heat_pump(self) -> HeatPumpEndpoints:
         """Get heat pump endpoints."""
-        return HeatPumpSection(base_url=self.device_url, ssl=self.ssl, session=self.session)
+        return HeatPumpEndpoints(base_url=self.device_url, ssl=self.ssl, session=self.session)
 
     @property
-    def heat_circuit(self) -> HeatCircuitSection:
+    def heat_circuit(self) -> HeatCircuitEndpoints:
         """Get heat circuit endpoints."""
-        return HeatCircuitSection(base_url=self.device_url, ssl=self.ssl, session=self.session)
+        return HeatCircuitEndpoints(base_url=self.device_url, ssl=self.ssl, session=self.session)
 
-    async def read_values(
+    async def read_data(
         self,
-        request: Control | list[Control],
-        position: Position | int | list[int | None] | None = None,
-        *,
-        human_readable: bool = True,
-        extra_attributes: bool = True,
-    ) -> ValueResponse:
-        """Read multiple values from API with one request."""
-        if position is None:
-            position = await self.options.get_positions()
-
-        return await self._read_values(
-            request=request,
-            position=position,
-            human_readable=human_readable,
-            extra_attributes=extra_attributes,
-        )
-
-    async def read_values_grouped_by_section(
-        self,
-        request: Control | list[Control],
+        request: Section | list[Section],
         position: Position | int | list[int | None] | None = None,
         *,
         human_readable: bool = True,
         extra_attributes: bool = True,
     ) -> dict[str, ValueResponse]:
-        """Read multiple grouped values from API with one request."""
-        response: ValueResponse = await self.read_values(
+        """Read multiple data from API with one request."""
+        if position is None:
+            position = await self.system.get_positions()
+
+        response: dict[str, list[Value]] = await self._read_data(
             request=request,
             position=position,
             human_readable=human_readable,
@@ -95,29 +83,32 @@ class KebaKeEnergyAPI(BaseSection):
         )
 
         data: dict[str, ValueResponse] = {
-            SystemPrefix.OUTDOOR.name: {},
-            SystemPrefix.OPTIONS.name: {},
-            SystemPrefix.HOT_WATER_TANK.name: {},
-            SystemPrefix.HEAT_PUMP.name: {},
-            SystemPrefix.HEAT_CIRCUIT.name: {},
+            SectionPrefix.SYSTEM.value: {},
+            SectionPrefix.HOT_WATER_TANK.value: {},
+            SectionPrefix.HEAT_PUMP.value: {},
+            SectionPrefix.HEAT_CIRCUIT.value: {},
         }
 
         for key, value in response.items():
-            if key.startswith(SystemPrefix.OUTDOOR):
-                data[SystemPrefix.OUTDOOR][key.lower()] = value
-            elif key.startswith(SystemPrefix.OPTIONS):
-                data[SystemPrefix.OPTIONS][key.lower()] = value
-            elif key.startswith(SystemPrefix.HOT_WATER_TANK):
-                data[SystemPrefix.HOT_WATER_TANK][key.lower()] = value
-            elif key.startswith(SystemPrefix.HEAT_PUMP):
-                data[SystemPrefix.HEAT_PUMP][key.lower()] = value
-            elif key.startswith(SystemPrefix.HEAT_CIRCUIT):
-                data[SystemPrefix.HEAT_CIRCUIT][key.lower()] = value
+            _key: str = ""
+
+            if key.startswith(SectionPrefix.SYSTEM):
+                _key = key.lower().replace(f"{SectionPrefix.SYSTEM.value}_", "")
+                data[SectionPrefix.SYSTEM][_key] = value[0]
+            elif key.startswith(SectionPrefix.HOT_WATER_TANK):
+                _key = key.lower().replace(f"{SectionPrefix.HOT_WATER_TANK.value}_", "")
+                data[SectionPrefix.HOT_WATER_TANK][_key] = value
+            elif key.startswith(SectionPrefix.HEAT_PUMP):
+                _key = key.lower().replace(f"{SectionPrefix.HEAT_PUMP.value}_", "")
+                data[SectionPrefix.HEAT_PUMP][_key] = value
+            elif key.startswith(SectionPrefix.HEAT_CIRCUIT):
+                _key = key.lower().replace(f"{SectionPrefix.HEAT_CIRCUIT.value}_", "")
+                data[SectionPrefix.HEAT_CIRCUIT][_key] = value
 
         return data
 
-    async def write_values(self, request: dict[Control, list[Any]]) -> None:
-        """Write multiple values to API with one request."""
+    async def write_data(self, request: dict[Section, list[Any]]) -> None:
+        """Write multiple data to API with one request."""
         await self._write_values(request=request)
 
     async def get_outdoor_temperature(self) -> float:

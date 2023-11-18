@@ -15,15 +15,16 @@ from aiohttp import ClientSession
 from aiohttp import ClientTimeout
 
 from keba_keenergy_api.constants import API_DEFAULT_TIMEOUT
-from keba_keenergy_api.constants import Control
-from keba_keenergy_api.constants import Endpoint
+from keba_keenergy_api.constants import EndpointPath
 from keba_keenergy_api.constants import HeatCircuit
 from keba_keenergy_api.constants import HeatCircuitOperatingMode
 from keba_keenergy_api.constants import HeatPump
+from keba_keenergy_api.constants import HeatPumpOperatingMode
 from keba_keenergy_api.constants import HotWaterTank
 from keba_keenergy_api.constants import HotWaterTankOperatingMode
-from keba_keenergy_api.constants import Options
-from keba_keenergy_api.constants import Outdoor
+from keba_keenergy_api.constants import Section
+from keba_keenergy_api.constants import System
+from keba_keenergy_api.constants import SystemOperatingMode
 from keba_keenergy_api.error import APIError
 from keba_keenergy_api.error import InvalidJsonError
 
@@ -52,12 +53,14 @@ class Value(TypedDict, total=False):
     attributes: dict[str, Any]
 
 
-ValueResponse: TypeAlias = dict[str, list[Value]]
+ValueResponse: TypeAlias = dict[str, list[Value] | Value]
 Payload: TypeAlias = list[ReadPayload | WritePayload]
 Response: TypeAlias = list[dict[str, str]]
 
 
-class BaseSection:
+class BaseEndpoints:
+    """Base class for all endpoint classes."""
+
     KEY_PATTERN: Pattern[str] = re.compile(r"(?<!^)(?=[A-Z])")
 
     def __init__(
@@ -103,16 +106,16 @@ class BaseSection:
 
         return response
 
-    def _get_real_key(self, key: Control, *, key_prefix: bool = True) -> str:
+    def _get_real_key(self, key: Section, *, key_prefix: bool = True) -> str:
         class_name: str = key.__class__.__name__
-        _real_key: str = key.name
+        _real_key: str = key.name.lower()
 
         if key_prefix is True:
-            _real_key = f"{self.KEY_PATTERN.sub('_', class_name).upper()}_{_real_key}"
+            _real_key = f"{self.KEY_PATTERN.sub('_', class_name).lower()}_{_real_key}"
 
         return _real_key
 
-    def _get_key_prefix(self, key: Control) -> str:
+    def _get_key_prefix(self, key: Section) -> str:
         module: ModuleType = importlib.import_module("keba_keenergy_api.constants")
         class_name: str = key.__class__.__name__
         prefix: str = getattr(module, f"{self.KEY_PATTERN.sub('_', class_name).upper()}_PREFIX", "")
@@ -123,13 +126,13 @@ class BaseSection:
         _position: str = "" if idx is None else f"[{idx}]"
         return _position
 
-    def _get_position_index(self, control: Control, position: Position | list[int | None]) -> list[int | None]:
+    def _get_position_index(self, section: Section, position: Position | list[int | None]) -> list[int | None]:
         idx: list[int | None] = []
 
-        if isinstance(control, Options):
+        if isinstance(section, System):
             idx = [None]
         elif isinstance(position, Position):
-            position_key: str = f"{self.KEY_PATTERN.sub('_', control.__class__.__name__).lower()}"
+            position_key: str = f"{self.KEY_PATTERN.sub('_', section.__class__.__name__).lower()}"
             _position: int | None = getattr(position, position_key, None)
             idx = list(range(_position)) if _position else [None]
         elif isinstance(position, list):
@@ -139,7 +142,7 @@ class BaseSection:
 
     def _generate_read_payload(
         self,
-        request: list[Control],
+        request: list[Section],
         position: Position | list[int | None],
         allowed_type: list[type[Enum]] | None,
         *,
@@ -147,12 +150,12 @@ class BaseSection:
     ) -> Payload:
         payload: Payload = []
 
-        for control in request:
-            if (allowed_type and type(control) in allowed_type) or allowed_type is None:
-                for idx in self._get_position_index(control=control, position=position):
+        for section in request:
+            if (allowed_type and type(section) in allowed_type) or allowed_type is None:
+                for idx in self._get_position_index(section=section, position=position):
                     payload += [
                         ReadPayload(
-                            name=f"{self._get_key_prefix(control)}{self._get_position(idx)}.{control.value.value}",
+                            name=f"{self._get_key_prefix(section)}{self._get_position(idx)}.{section.value.value}",
                             attr=str(int(extra_attributes is True)),
                         ),
                     ]
@@ -160,13 +163,13 @@ class BaseSection:
         return payload
 
     @staticmethod
-    def _convert_value(control: Control, response: list[dict[str, Any]], *, human_readable: bool) -> float | int | str:
-        value: float | int | str = control.value.data_type(response[0]["value"])
+    def _convert_value(section: Section, response: list[dict[str, Any]], *, human_readable: bool) -> float | int | str:
+        value: float | int | str = section.value.value_type(response[0]["value"])
         value = round(value, 2) if isinstance(value, float) else value
 
-        if human_readable and control.value.human_readable:
+        if human_readable and section.value.human_readable:
             try:
-                value = control.value.human_readable(value).name.lower()
+                value = section.value.human_readable(value).name.lower()
             except ValueError as error:
                 msg: str = f"Can't convert value to human readable value! {response[0]}"
 
@@ -181,23 +184,23 @@ class BaseSection:
         re_pattern: Pattern[str] = re.compile(r"(?<!^)(?=[A-Z])")
 
         for attr_key in attributes:
-            if attr_key not in ["longText", "formatId", "dynLowerLimit", "dynUpperLimit"]:
+            if attr_key not in ["unitId", "longText", "formatId", "dynLowerLimit", "dynUpperLimit"]:
                 new_attr_key: str = re_pattern.sub("_", attr_key).lower()
                 converted_attributes[new_attr_key] = attributes[attr_key]
 
         return converted_attributes
 
-    async def _read_values(
+    async def _read_data(
         self,
-        request: Control | list[Control],
+        request: Section | list[Section],
         position: Position | int | list[int | None] | None = 1,
         allowed_type: type[Enum] | list[type[Enum]] | None = None,
         *,
         key_prefix: bool = True,
         human_readable: bool = True,
         extra_attributes: bool = False,
-    ) -> ValueResponse:
-        if isinstance(request, Options | Outdoor | HotWaterTank | HeatPump | HeatCircuit):
+    ) -> dict[str, list[Value]]:
+        if isinstance(request, System | HotWaterTank | HeatPump | HeatCircuit):
             request = [request]
 
         if isinstance(position, int) or position is None:
@@ -215,22 +218,22 @@ class BaseSection:
 
         _response: list[dict[str, Any]] = await self._post(
             payload=json.dumps(payload),
-            endpoint=Endpoint.READ_VALUES,
+            endpoint=EndpointPath.READ_WRITE_VARS,
         )
 
         response: dict[str, list[Value]] = {}
 
-        for control in request:
-            if (allowed_type and type(control) in allowed_type) or not allowed_type:
-                for _ in self._get_position_index(control=control, position=position):
-                    response_key: str = self._get_real_key(control, key_prefix=key_prefix)
+        for section in request:
+            if (allowed_type and type(section) in allowed_type) or not allowed_type:
+                for _ in self._get_position_index(section=section, position=position):
+                    response_key: str = self._get_real_key(section, key_prefix=key_prefix)
 
                     if not response.get(response_key):
                         response[response_key] = []
 
                     _value: Value = {
                         "value": self._convert_value(
-                            control,
+                            section,
                             response=_response,
                             human_readable=human_readable,
                         ),
@@ -242,132 +245,149 @@ class BaseSection:
 
         return response
 
-    def _generate_write_payload(self, request: dict[Control, list[Any]]) -> Payload:
+    def _generate_write_payload(self, request: dict[Section, list[Any]]) -> Payload:
         payload: Payload = []
 
-        for control, values in request.items():
-            if not control.value.read_only:
-                for idx, value in enumerate(values):
-                    if value is not None:
-                        payload += [
-                            WritePayload(
-                                name=f"{self._get_key_prefix(control)}{self._get_position(idx)}.{control.value.value}",
-                                value=str(value),
-                            ),
-                        ]
+        for endpoint_properties, values in request.items():
+            if not endpoint_properties.value.read_only:
+                if isinstance(values, list | tuple):
+                    for idx, value in enumerate(values):
+                        if value is not None:
+                            payload += [
+                                WritePayload(
+                                    name=(
+                                        f"{self._get_key_prefix(endpoint_properties)}{self._get_position(idx)}."
+                                        f"{endpoint_properties.value.value}"
+                                    ),
+                                    value=str(value),
+                                ),
+                            ]
+                else:
+                    payload += [
+                        WritePayload(
+                            name=f"{self._get_key_prefix(endpoint_properties)}.{endpoint_properties.value.value}",
+                            value=str(values),
+                        ),
+                    ]
 
         return payload
 
-    async def _write_values(self, request: dict[Control, list[Any]]) -> None:
+    async def _write_values(self, request: dict[Section, list[Any] | Any]) -> None:
         payload: Payload = self._generate_write_payload(request)
 
         await self._post(
             payload=json.dumps(payload),
-            endpoint=Endpoint.WRITE_VALUES,
+            endpoint=f"{EndpointPath.READ_WRITE_VARS}?action=set",
         )
 
 
-class DeviceSection(BaseSection):
-    """Class to retrieve the device data."""
-
-    def __init__(self, base_url: str, *, ssl: bool, session: ClientSession | None = None) -> None:
-        super().__init__(base_url=base_url, ssl=ssl, session=session)
-
-    async def get_device_info(self) -> dict[str, Any]:
-        """Get device info."""
-        response: Response = await self._post(endpoint=Endpoint.DEVICE_INFO)
-        response[0].pop("ret")
-        return response[0]
-
-    async def get_name(self) -> str:
-        """Get name."""
-        response: Response = await self._post(endpoint=Endpoint.DEVICE_INFO)
-        return str(response[0]["name"])
-
-    async def get_serial_number(self) -> int:
-        """Get serial_number."""
-        response: Response = await self._post(endpoint=Endpoint.DEVICE_INFO)
-        return int(response[0]["serNo"])
-
-    async def get_revision_number(self) -> int:
-        """Get revision name."""
-        response: Response = await self._post(endpoint=Endpoint.DEVICE_INFO)
-        return int(response[0]["revNo"])
-
-    async def get_variant_number(self) -> int:
-        """Get variant name."""
-        response: Response = await self._post(endpoint=Endpoint.DEVICE_INFO)
-        return int(response[0]["variantNo"])
-
-    async def get_system_info(self) -> dict[str, Any]:
-        """Get system information."""
-        response: Response = await self._post(endpoint=Endpoint.SYSTEM_INFO)
-        response[0].pop("ret")
-        return response[0]
-
-
-class OptionsSection(BaseSection):
-    """Class to retrieve the option data."""
+class SystemEndpoints(BaseEndpoints):
+    """Class to retrieve the system data."""
 
     def __init__(self, base_url: str, *, ssl: bool, session: ClientSession | None = None) -> None:
         super().__init__(base_url=base_url, ssl=ssl, session=session)
 
     async def get_positions(self) -> Position:
         """Get number of heat pump, heating circuit and hot water tank."""
-        data: ValueResponse = await self.read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=[
-                Options.HEAT_PUMP_NUMBERS,
-                Options.HEAT_CIRCUIT_NUMBERS,
-                Options.HOT_WATER_TANK_NUMBERS,
+                System.HEAT_PUMP_NUMBERS,
+                System.HEAT_CIRCUIT_NUMBERS,
+                System.HOT_WATER_TANK_NUMBERS,
             ],
-        )
-
-        return Position(**{k.replace("_NUMBERS", "").lower(): int(v[0]["value"]) for k, v in data.items()})
-
-    async def read_values(self, request: Control | list[Control], *, extra_attributes: bool = True) -> ValueResponse:
-        """Read multiple option values from API with one request."""
-        _values: ValueResponse = await self._read_values(
-            request=request,
             position=None,
             key_prefix=False,
-            allowed_type=Options,
-            extra_attributes=extra_attributes,
+            allowed_type=System,
+            extra_attributes=True,
         )
 
-        return _values
+        return Position(**{k.replace("_numbers", ""): int(v[0]["value"]) for k, v in response.items()})
+
+    async def get_info(self) -> dict[str, Any]:
+        """Get system information."""
+        response: Response = await self._post(
+            endpoint=f"{EndpointPath.SW_UPDATE}?action=getSystemInstalled",
+        )
+        response[0].pop("ret")
+        return response[0]
+
+    async def get_device_info(self) -> dict[str, Any]:
+        """Get device information."""
+        response: Response = await self._post(
+            endpoint=f"{EndpointPath.DEVICE_CONTROL}?action=getDeviceInfo",
+        )
+        response[0].pop("ret")
+        return response[0]
 
     async def get_number_of_hot_water_tanks(self) -> int:
         """Get number of hot water tanks."""
-        response: ValueResponse = await self._read_values(
-            request=Options.HOT_WATER_TANK_NUMBERS,
+        response: dict[str, list[Value]] = await self._read_data(
+            request=System.HOT_WATER_TANK_NUMBERS,
             position=None,
             extra_attributes=True,
         )
-        _key: str = self._get_real_key(Options.HOT_WATER_TANK_NUMBERS)
+        _key: str = self._get_real_key(System.HOT_WATER_TANK_NUMBERS)
         return int(response[_key][0]["value"])
 
     async def get_number_of_heat_pumps(self) -> int:
         """Get number of heat pumps."""
-        response: ValueResponse = await self._read_values(
-            request=Options.HEAT_PUMP_NUMBERS,
+        response: dict[str, list[Value]] = await self._read_data(
+            request=System.HEAT_PUMP_NUMBERS,
             position=None,
             extra_attributes=True,
         )
-        _key: str = self._get_real_key(Options.HEAT_PUMP_NUMBERS)
+        _key: str = self._get_real_key(System.HEAT_PUMP_NUMBERS)
         return int(response[_key][0]["value"])
 
     async def get_number_of_heating_circuits(self) -> int:
         """Get number of heating circuits."""
-        response: ValueResponse = await self._read_values(
-            request=Options.HEAT_CIRCUIT_NUMBERS,
+        response: dict[str, list[Value]] = await self._read_data(
+            request=System.HEAT_CIRCUIT_NUMBERS,
             position=None,
             extra_attributes=True,
         )
-        _key: str = self._get_real_key(Options.HEAT_CIRCUIT_NUMBERS)
+        _key: str = self._get_real_key(System.HEAT_CIRCUIT_NUMBERS)
         return int(response[_key][0]["value"])
 
+    async def get_outdoor_temperature(self) -> float:
+        """Get outdoor temperature."""
+        response: dict[str, Any] = await self._read_data(
+            request=System.OUTDOOR_TEMPERATURE,
+            position=None,
+            extra_attributes=True,
+        )
+        _key: str = self._get_real_key(System.OUTDOOR_TEMPERATURE)
+        return float(response[_key][0]["value"])
 
-class HotWaterTankSection(BaseSection):
+    async def get_operating_mode(self, *, human_readable: bool = True) -> int | str:
+        """Get system operating mode."""
+        response: dict[str, list[Value]] = await self._read_data(
+            request=System.OPERATING_MODE,
+            position=None,
+            human_readable=human_readable,
+            extra_attributes=True,
+        )
+        _key: str = self._get_real_key(System.OPERATING_MODE)
+
+        try:
+            _value: int | str = int(response[_key][0]["value"])
+        except ValueError:
+            _value = str(response[_key][0]["value"])
+
+        return _value
+
+    async def set_operating_mode(self, mode: int | str) -> None:
+        """Set sytem operating mode."""
+        try:
+            _mode: int | None = mode if isinstance(mode, int) else SystemOperatingMode[mode.upper()].value
+        except KeyError as error:
+            msg: str = "Invalid operating mode!"
+            raise APIError(msg) from error
+
+        await self._write_values(request={System.OPERATING_MODE: _mode})
+
+
+class HotWaterTankEndpoints(BaseEndpoints):
     """Class to send and retrieve the hot water tank data."""
 
     def __init__(self, base_url: str, *, ssl: bool, session: ClientSession | None = None) -> None:
@@ -375,7 +395,7 @@ class HotWaterTankSection(BaseSection):
 
     async def get_temperature(self, position: int | None = 1) -> float:
         """Get current temperature."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HotWaterTank.TEMPERATURE,
             position=position,
             extra_attributes=True,
@@ -386,7 +406,7 @@ class HotWaterTankSection(BaseSection):
 
     async def get_operating_mode(self, position: int | None = 1, *, human_readable: bool = True) -> int | str:
         """Get operating mode."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HotWaterTank.OPERATING_MODE,
             position=position,
             human_readable=human_readable,
@@ -416,7 +436,7 @@ class HotWaterTankSection(BaseSection):
 
     async def get_lower_limit_temperature(self, position: int | None = 1) -> int:
         """Get lower limit temperature."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HotWaterTank.MAX_TEMPERATURE,
             position=position,
             extra_attributes=True,
@@ -427,7 +447,7 @@ class HotWaterTankSection(BaseSection):
 
     async def get_upper_limit_temperature(self, position: int | None = 1) -> int:
         """Get uper limit temperature."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HotWaterTank.MAX_TEMPERATURE,
             position=position,
             extra_attributes=True,
@@ -438,7 +458,7 @@ class HotWaterTankSection(BaseSection):
 
     async def get_min_temperature(self, position: int | None = 1) -> float:
         """Get minimum temperature."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HotWaterTank.MIN_TEMPERATURE,
             position=position,
             extra_attributes=True,
@@ -454,7 +474,7 @@ class HotWaterTankSection(BaseSection):
 
     async def get_max_temperature(self, position: int | None = 1) -> float:
         """Get maximum temperature."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HotWaterTank.MAX_TEMPERATURE,
             position=position,
             extra_attributes=True,
@@ -470,7 +490,7 @@ class HotWaterTankSection(BaseSection):
 
     async def get_heat_request(self, position: int | None = 1, *, human_readable: bool = True) -> int | str:
         """Get heat request."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HotWaterTank.HEAT_REQUEST,
             position=position,
             human_readable=human_readable,
@@ -486,7 +506,7 @@ class HotWaterTankSection(BaseSection):
         return _value
 
 
-class HeatPumpSection(BaseSection):
+class HeatPumpEndpoints(BaseEndpoints):
     """Class to retrieve the heat pump data."""
 
     def __init__(self, base_url: str, *, ssl: bool, session: ClientSession | None = None) -> None:
@@ -494,7 +514,7 @@ class HeatPumpSection(BaseSection):
 
     async def get_name(self, position: int | None = 1) -> str:
         """Get heat pump name."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HeatPump.NAME,
             position=position,
             extra_attributes=True,
@@ -503,16 +523,16 @@ class HeatPumpSection(BaseSection):
         _key: str = self._get_real_key(HeatPump.NAME)
         return str(response[_key][_idx]["value"])
 
-    async def get_status(self, position: int | None = 1, *, human_readable: bool = True) -> int | str:
-        """Get status."""
-        response: ValueResponse = await self._read_values(
-            request=HeatPump.STATUS,
+    async def get_state(self, position: int | None = 1, *, human_readable: bool = True) -> int | str:
+        """Get heat pump state."""
+        response: dict[str, list[Value]] = await self._read_data(
+            request=HeatPump.STATE,
             position=position,
             human_readable=human_readable,
             extra_attributes=True,
         )
         _idx: int = position - 1 if position else 0
-        _key: str = self._get_real_key(HeatPump.STATUS)
+        _key: str = self._get_real_key(HeatPump.STATE)
 
         try:
             _value: int | str = int(response[_key][_idx]["value"])
@@ -521,9 +541,39 @@ class HeatPumpSection(BaseSection):
 
         return _value
 
+    async def get_operating_mode(self, position: int | None = 1, *, human_readable: bool = True) -> int | str:
+        """Get operating mode."""
+        response: dict[str, list[Value]] = await self._read_data(
+            request=HeatPump.OPERATING_MODE,
+            position=position,
+            human_readable=human_readable,
+            extra_attributes=True,
+        )
+        _idx: int = position - 1 if position else 0
+        _key: str = self._get_real_key(HeatPump.OPERATING_MODE)
+
+        try:
+            _value: int | str = int(response[_key][_idx]["value"])
+        except ValueError:
+            _value = str(response[_key][_idx]["value"])
+
+        return _value
+
+    async def set_operating_mode(self, mode: int | str, position: int = 1) -> None:
+        """Set operating mode."""
+        try:
+            _mode: int | None = mode if isinstance(mode, int) else HeatPumpOperatingMode[mode.upper()].value
+        except KeyError as error:
+            msg: str = "Invalid operating mode!"
+            raise APIError(msg) from error
+
+        modes: list[int | None] = [_mode if position == p else None for p in range(1, position + 1)]
+
+        await self._write_values(request={HeatPump.OPERATING_MODE: modes})
+
     async def get_circulation_pump(self, position: int | None = 1) -> float:
         """Get circulation pump."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HeatPump.CIRCULATION_PUMP,
             position=position,
             extra_attributes=True,
@@ -534,7 +584,7 @@ class HeatPumpSection(BaseSection):
 
     async def get_inflow_temperature(self, position: int | None = 1) -> float:
         """Get inflow temperature."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HeatPump.INFLOW_TEMPERATURE,
             position=position,
             extra_attributes=True,
@@ -545,7 +595,7 @@ class HeatPumpSection(BaseSection):
 
     async def get_reflux_temperature(self, position: int | None = 1) -> float:
         """Get reflux temperature."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HeatPump.REFLUX_TEMPERATURE,
             position=position,
             extra_attributes=True,
@@ -556,7 +606,7 @@ class HeatPumpSection(BaseSection):
 
     async def get_source_input_temperature(self, position: int | None = 1) -> float:
         """Get source input temperature."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HeatPump.SOURCE_INPUT_TEMPERATURE,
             position=position,
             extra_attributes=True,
@@ -567,7 +617,7 @@ class HeatPumpSection(BaseSection):
 
     async def get_source_output_temperature(self, position: int | None = 1) -> float:
         """Get source output temperature."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HeatPump.SOURCE_OUTPUT_TEMPERATURE,
             position=position,
             extra_attributes=True,
@@ -578,7 +628,7 @@ class HeatPumpSection(BaseSection):
 
     async def get_compressor_input_temperature(self, position: int | None = 1) -> float:
         """Get compressor input temperature."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HeatPump.COMPRESSOR_INPUT_TEMPERATURE,
             position=position,
             extra_attributes=True,
@@ -589,7 +639,7 @@ class HeatPumpSection(BaseSection):
 
     async def get_compressor_output_temperature(self, position: int | None = 1) -> float:
         """Get compressor output temperature."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HeatPump.COMPRESSOR_OUTPUT_TEMPERATURE,
             position=position,
             extra_attributes=True,
@@ -600,7 +650,7 @@ class HeatPumpSection(BaseSection):
 
     async def get_compressor(self, position: int | None = 1) -> float:
         """Get compressor."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HeatPump.COMPRESSOR,
             position=position,
             extra_attributes=True,
@@ -611,7 +661,7 @@ class HeatPumpSection(BaseSection):
 
     async def get_high_pressure(self, position: int | None = 1) -> float:
         """Get high pressure in bar."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HeatPump.HIGH_PRESSURE,
             position=position,
             extra_attributes=True,
@@ -622,7 +672,7 @@ class HeatPumpSection(BaseSection):
 
     async def get_low_pressure(self, position: int | None = 1) -> float:
         """Get low pressure in bar."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HeatPump.LOW_PRESSURE,
             position=position,
             extra_attributes=True,
@@ -633,7 +683,7 @@ class HeatPumpSection(BaseSection):
 
     async def get_heat_request(self, position: int | None = 1, *, human_readable: bool = True) -> int | str:
         """Get heat request."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HeatPump.HEAT_REQUEST,
             position=position,
             human_readable=human_readable,
@@ -649,7 +699,7 @@ class HeatPumpSection(BaseSection):
         return _value
 
 
-class HeatCircuitSection(BaseSection):
+class HeatCircuitEndpoints(BaseEndpoints):
     """Class to send and retrieve the heat pump data."""
 
     def __init__(self, base_url: str, *, ssl: bool, session: ClientSession | None = None) -> None:
@@ -657,7 +707,7 @@ class HeatCircuitSection(BaseSection):
 
     async def get_name(self, position: int | None = 1) -> str:
         """Get heat circuit name."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HeatCircuit.NAME,
             position=position,
             extra_attributes=True,
@@ -668,7 +718,7 @@ class HeatCircuitSection(BaseSection):
 
     async def get_temperature(self, position: int | None = 1) -> float:
         """Get temperature."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HeatCircuit.TEMPERATURE,
             position=position,
             extra_attributes=True,
@@ -679,7 +729,7 @@ class HeatCircuitSection(BaseSection):
 
     async def get_day_temperature(self, position: int | None = 1) -> float:
         """Get day temperature."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HeatCircuit.DAY_TEMPERATURE,
             position=position,
             extra_attributes=True,
@@ -695,7 +745,7 @@ class HeatCircuitSection(BaseSection):
 
     async def get_day_temperature_threshold(self, position: int | None = 1) -> float:
         """Get day temperature threshold."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HeatCircuit.DAY_TEMPERATURE_THRESHOLD,
             position=position,
             extra_attributes=True,
@@ -706,7 +756,7 @@ class HeatCircuitSection(BaseSection):
 
     async def get_night_temperature(self, position: int | None = 1) -> float | None:
         """Get night temperature."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HeatCircuit.NIGHT_TEMPERATURE,
             position=position,
             extra_attributes=True,
@@ -722,7 +772,7 @@ class HeatCircuitSection(BaseSection):
 
     async def get_night_temperature_threshold(self, position: int | None = 1) -> float:
         """Get night temperature threshold."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HeatCircuit.NIGHT_TEMPERATURE_THRESHOLD,
             position=position,
             extra_attributes=True,
@@ -733,7 +783,7 @@ class HeatCircuitSection(BaseSection):
 
     async def get_holiday_temperature(self, position: int | None = 1) -> float:
         """Get holiday temperature."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HeatCircuit.HOLIDAY_TEMPERATURE,
             position=position,
             extra_attributes=True,
@@ -749,7 +799,7 @@ class HeatCircuitSection(BaseSection):
 
     async def get_offset_temperature(self, position: int | None = 1) -> float:
         """Get offset temperature."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HeatCircuit.OFFSET_TEMPERATURE,
             position=position,
             extra_attributes=True,
@@ -765,7 +815,7 @@ class HeatCircuitSection(BaseSection):
 
     async def get_operating_mode(self, position: int | None = 1, *, human_readable: bool = True) -> int | str:
         """Get operating mode."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HeatCircuit.OPERATING_MODE,
             position=position,
             human_readable=human_readable,
@@ -795,7 +845,7 @@ class HeatCircuitSection(BaseSection):
 
     async def get_heat_request(self, position: int | None = 1, *, human_readable: bool = True) -> int | str:
         """Get heat request."""
-        response: ValueResponse = await self._read_values(
+        response: dict[str, list[Value]] = await self._read_data(
             request=HeatCircuit.HEAT_REQUEST,
             position=position,
             human_readable=human_readable,
@@ -808,5 +858,39 @@ class HeatCircuitSection(BaseSection):
             _value: int | str = int(response[_key][_idx]["value"])
         except ValueError:
             _value = str(response[_key][_idx]["value"])
+
+        return _value
+
+    async def get_external_cool_request(self, position: int | None = 1, *, human_readable: bool = True) -> int | str:
+        """Get external cool request."""
+        response: dict[str, list[Value]] = await self._read_data(
+            request=HeatCircuit.EXTERNAL_COOL_REQUEST,
+            position=position,
+            human_readable=human_readable,
+            extra_attributes=True,
+        )
+        _idx: int = position - 1 if position else 0
+        _key: str = self._get_real_key(HeatCircuit.EXTERNAL_COOL_REQUEST)
+        _value: int | str = str(response[_key][_idx]["value"])
+
+        if _value in ["true", "false"]:
+            _value = 1 if _value == "true" else 0
+
+        return _value
+
+    async def get_external_heat_request(self, position: int | None = 1, *, human_readable: bool = True) -> int | str:
+        """Get external heat request."""
+        response: dict[str, list[Value]] = await self._read_data(
+            request=HeatCircuit.EXTERNAL_HEAT_REQUEST,
+            position=position,
+            human_readable=human_readable,
+            extra_attributes=True,
+        )
+        _idx: int = position - 1 if position else 0
+        _key: str = self._get_real_key(HeatCircuit.EXTERNAL_HEAT_REQUEST)
+        _value: int | str = str(response[_key][_idx]["value"])
+
+        if _value in ["true", "false"]:
+            _value = 1 if _value == "true" else 0
 
         return _value

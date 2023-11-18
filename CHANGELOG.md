@@ -7,9 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added `system.get_operation_mode()` endpoint.
+- Added `system.set_operation_mode()` endpoint.
+- Added `heat_pump.get_operation_mode()` endpoint.
+- Added `heat_pump.set_operation_mode()` endpoint.
+- Added `heat_circuit.get_external_cool_request()` endpoint.
+- Added `heat_circuit.get_external_heat_request()` endpoint.
+
 ### Changed
 
-- Convert attributes keys to lower case
+- Convert attributes keys to lower case.
+- Merge options and devices endpoint to system endpoint.
+- Rename `read_values()` to `read_data()`
+- Rename `write_values()` to `write_data()`
+- Rename `heat_pump.get_status()` to `heat_pump.get_state()`
 
 ## [1.11.1] - 2023-10-25
 

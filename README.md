@@ -37,21 +37,21 @@ async def main() -> None:
     heat_circuit_temperature: float = await client.heat_circuit.get_temperature(position=2)
 
     # Read multiple values
-    data: dict[str, tuple[float | int | str]] = await client.read_values(
+    data: dict[str, tuple[float | int | str]] = await client.read_data(
         request=[
-            HeatCircuit.TEMPERATURE, 
+            HeatCircuit.TEMPERATURE,
             HeatCircuit.DAY_TEMPERATURE,
         ],
     )
-    
+
     # Enable "day" mode for heat circuit 2
     await client.heat_circuit.set_operating_mode(mode="day", position=2)
 
     # Write multiple values
-    await client.write_values(
+    await client.write_data(
         request={
             HeatCircuit.DAY_TEMPERATURE: (20, None, 5),  # Write heat circuit on position 1 and 3 
-            HeatCircuit.NIGHT_TEMPERATURE: (16,),        # Write night temperature on position 1
+            HeatCircuit.NIGHT_TEMPERATURE: (16,),  # Write night temperature on position 1
         },
     )
 
@@ -80,55 +80,55 @@ asyncio.run(main())
 
 ### API endpoints
 
-| Endpoint                                                             | Response | Description                                        |
-|----------------------------------------------------------------------|----------|----------------------------------------------------|
-| `.get_outdoor_temperature()`                                         | `float`  | Get outdoor temperature.                           |
-| `.read_values(request, position, human_readable)`                    |          | Get multiple values with one http request.         |
-| `.read_values_grouped_by_section(request, position, human_readable)` |          | Get multiple grouped values with one http request. |
-| `.write_values(request)`                                             |          | Write multiple values with one http request.       |
+| Endpoint                                        | Description                                  |
+|-------------------------------------------------|----------------------------------------------|
+| `.read_data(request, position, human_readable)` | Get multiple values with one http request.   |
+| `.write_data(request)`                          | Write multiple values with one http request. |
 
-#### Device
+#### System
 
-| Endpoint                 | Response | Description                 |
-|--------------------------|----------|-----------------------------|
-| `.get_device_info()`     | `str`    | Get all device information. |
-| `.get_name()`            | `str`    | Get name.                   |
-| `.get_serial_number()`   | `int`    | Get serial number.          |
-| `.get_revision_number()` | `int`    | Get revision name.          |
-| `.get_variant_number()`  | `int`    | Get variant name.           |
+| Endpoint                                           | Response       | Description                                                                                                        |
+|----------------------------------------------------|----------------|--------------------------------------------------------------------------------------------------------------------|
+| `.get_info()`                                      | `str`          | Get system information.                                                                                            |
+| `.get_device_info()`                               | `str`          | Get device information.                                                                                            |
+| `.get_outdoor_temperature()`                       | `float`        | Get outdoor temperature.                                                                                           |
+| `.get_operating_mode(position, human_readable)`    | `int` or `str` | Get operating mode as integer (0 is `STANDBY`, 1 is `SUMMER`, 2 is `AUTO_HEAT`, 3 is `AUTO_COOL` and 4 is `AUTO`). |
+| `.set_operating_mode(0, position, human_readable)` | `int` or `str` | Set operating mode.                                                                                                |
+
 
 #### Hot water tank
 
-| Endpoint                                           | Request/Response | Description                                                                          |
-|----------------------------------------------------|------------------|--------------------------------------------------------------------------------------|
-| `.get_lower_limit_temperature(position)`           | `int`            | Get lower limit temperature.                                                         |
-| `.get_upper_limit_temperature(position)`           | `int`            | Get upper limit temperature.                                                         |
-| `.get_temperature(position)`                       | `float`          | Get temperature.                                                                     |
-| `.get_operating_mode(position, human_readable)`    | `int` or `str`   | Get operating mode as integer (0 is `OFF`, 1 is `AUTO`, 2 is `DAY` and 3 is `NIGHT`. |
-| `.set_operating_mode(0, position, human_readable)` | `int` or `str`   | Set operating mode.                                                                  |
-| `.get_min_temperature(position)`                   | `float`          | Get minimum temperature.                                                             |
-| `.set_min_temperature(20, position)`               | `float`          | Set minimum temperature.                                                             |
-| `.get_max_temperature(position)`                   | `float`          | Get maximum temperature.                                                             |
-| `.set_max_temperature(22, position)`               | `float`          | Set maximum temperature.                                                             |
-| `.get_heat_request(position)`                      | `int` or `str`   | Get heat request.                                                                    |
+| Endpoint                                           | Request/Response | Description                                                                           |
+|----------------------------------------------------|------------------|---------------------------------------------------------------------------------------|
+| `.get_lower_limit_temperature(position)`           | `int`            | Get lower limit temperature.                                                          |
+| `.get_upper_limit_temperature(position)`           | `int`            | Get upper limit temperature.                                                          |
+| `.get_temperature(position)`                       | `float`          | Get temperature.                                                                      |
+| `.get_operating_mode(position, human_readable)`    | `int` or `str`   | Get operating mode as integer (0 is `OFF`, 1 is `AUTO`, 2 is `DAY` and 3 is `NIGHT`). |
+| `.set_operating_mode(0, position, human_readable)` | `int` or `str`   | Set operating mode.                                                                   |
+| `.get_min_temperature(position)`                   | `float`          | Get minimum temperature.                                                              |
+| `.set_min_temperature(20, position)`               | `float`          | Set minimum temperature.                                                              |
+| `.get_max_temperature(position)`                   | `float`          | Get maximum temperature.                                                              |
+| `.set_max_temperature(22, position)`               | `float`          | Set maximum temperature.                                                              |
+| `.get_heat_request(position)`                      | `int` or `str`   | Get heat request.                                                                     |
 
 ### Heat pump
 
-| Endpoint                                       | Response       | Description                                                                 |
-|------------------------------------------------|----------------|-----------------------------------------------------------------------------|
-| `.get_name(position)`                          | `str`          | Get head pump model name.                                                   |
-| `.get_status(position, human_readable)`        | `int` or `str` | Get operating mode as integer (0 is `STANDBY`, 1 is `FLOW` and 2 is `AUTO`. |
-| `.get_circulation_pump(position)`              | `float`        | Get circulation pump in percent.                                            |
-| `.get_inflow_temperature(position)`            | `float`        | Get inflow temperature.                                                     |
-| `.get_reflux_temperature(position)`            | `float`        | Get reflux temperature.                                                     |
-| `.get_source_input_temperature(position)`      | `float`        | Get source input temperature.                                               |
-| `.get_source_output_temperature(position)`     | `float`        | Get source output temperature.                                              |
-| `.get_compressor_input_temperature(position)`  | `float`        | Get compressor input temperature.                                           |
-| `.get_compressor_output_temperature(position)` | `float`        | Get compressor output temperature.                                          |
-| `.get_compressor(position)`                    | `float`        | Get compressor in percent.                                                  |
-| `.get_high_pressure(position)`                 | `float`        | Get high pressure.                                                          |
-| `.get_low_pressure(position)`                  | `float`        | Get low pressure.                                                           |
-| `.get_heat_request(position)`                  | `int` or `str` | Get heat request.                                                           |
+| Endpoint                                         | Response       | Description                                                                   |
+|--------------------------------------------------|----------------|-------------------------------------------------------------------------------|
+| `.get_name(position)`                            | `str`          | Get head pump model name.                                                     |
+| `.get_state(position, human_readable)`           | `int` or `str` | Get heat pump state as integer (0 is `STANDBY`, 1 is `FLOW` and 2 is `AUTO`). |
+| `.get_operating_mode(position, human_readable)`  | `int` or `str` | Get operating mode as integer (0 is `OFF`, 1 is `ON`, 2 is `BACKUP`).         |
+| `.get_circulation_pump(position)`                | `float`        | Get circulation pump in percent.                                              |
+| `.get_inflow_temperature(position)`              | `float`        | Get inflow temperature.                                                       |
+| `.get_reflux_temperature(position)`              | `float`        | Get reflux temperature.                                                       |
+| `.get_source_input_temperature(position)`        | `float`        | Get source input temperature.                                                 |
+| `.get_source_output_temperature(position)`       | `float`        | Get source output temperature.                                                |
+| `.get_compressor_input_temperature(position)`    | `float`        | Get compressor input temperature.                                             |
+| `.get_compressor_output_temperature(position)`   | `float`        | Get compressor output temperature.                                            |
+| `.get_compressor(position)`                      | `float`        | Get compressor in percent.                                                    |
+| `.get_high_pressure(position)`                   | `float`        | Get high pressure.                                                            |
+| `.get_low_pressure(position)`                    | `float`        | Get low pressure.                                                             |
+| `.get_heat_request(position)`                    | `int` or `str` | Get heat request.                                                             |
 
 ### Heat circuit
 
@@ -148,6 +148,8 @@ asyncio.run(main())
 | `.get_operating_mode(position, human_readable)` | `int` or `str` | Get operating mode (0 is `OFF` and 3 is `HEAT_UP`). |
 | `.set_operating_mode(3, position)`              | `int` or `str` | Set operating mode.                                 |
 | `.get_heat_request(position)`                   | `int` or `str` | Get heat request.                                   |
+| `.get_external_cool_request(position)`          | `int` or `str` | Get external cool request.                          |
+| `.get_external_heat_request(position)`          | `int` or `str` | Get external heat request.                          |
 
 ## Changelog
 

@@ -4,210 +4,20 @@ import pytest
 from aioresponses.core import aioresponses
 
 from keba_keenergy_api.api import KebaKeEnergyAPI
+from keba_keenergy_api.constants import HeatCircuitExternalCoolRequest
+from keba_keenergy_api.constants import HeatCircuitExternalHeatRequest
 from keba_keenergy_api.constants import HeatCircuitHeatRequest
 from keba_keenergy_api.constants import HeatCircuitOperatingMode
 from keba_keenergy_api.constants import HeatPumpHeatRequest
+from keba_keenergy_api.constants import HeatPumpOperatingMode
 from keba_keenergy_api.constants import HotWaterTankHeatRequest
 from keba_keenergy_api.constants import HotWaterTankOperatingMode
+from keba_keenergy_api.constants import SystemOperatingMode
 from keba_keenergy_api.endpoints import Position
 from keba_keenergy_api.error import APIError
 
 
-class TestDeviceSection:
-    @pytest.mark.asyncio()
-    async def test_device_info(self) -> None:
-        """Test get device info from hardware."""
-        with aioresponses() as mock_keenergy_api:
-            mock_keenergy_api.post(
-                "http://mocked-host/deviceControl?action=getDeviceInfo",
-                payload=[
-                    {
-                        "ret": "OK",
-                        "revNo": 2,
-                        "orderNo": 12345678,
-                        "serNo": 12345678,
-                        "name": "MOCKED-NAME",
-                        "variantNo": 0,
-                    },
-                ],
-                headers={"Content-Type": "application/json;charset=utf-8"},
-            )
-
-            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
-            response: dict[str, Any] = await client.device.get_device_info()
-
-            assert isinstance(response, dict)
-            assert response == {
-                "revNo": 2,
-                "orderNo": 12345678,
-                "serNo": 12345678,
-                "name": "MOCKED-NAME",
-                "variantNo": 0,
-            }
-
-            mock_keenergy_api.assert_called_once_with(
-                url="http://mocked-host/deviceControl?action=getDeviceInfo",
-                method="POST",
-                ssl=False,
-            )
-
-    @pytest.mark.asyncio()
-    async def test_get_name(self) -> None:
-        """Test get device name from hardware."""
-        with aioresponses() as mock_keenergy_api:
-            mock_keenergy_api.post(
-                "http://mocked-host/deviceControl?action=getDeviceInfo",
-                payload=[
-                    {
-                        "ret": "OK",
-                        "revNo": 2,
-                        "orderNo": 12345678,
-                        "serNo": 12345678,
-                        "name": "MOCKED-NAME",
-                        "variantNo": 0,
-                    },
-                ],
-                headers={"Content-Type": "application/json;charset=utf-8"},
-            )
-
-            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
-            response: str = await client.device.get_name()
-
-            assert isinstance(response, str)
-            assert response == "MOCKED-NAME"
-
-            mock_keenergy_api.assert_called_once_with(
-                url="http://mocked-host/deviceControl?action=getDeviceInfo",
-                method="POST",
-                ssl=False,
-            )
-
-    @pytest.mark.asyncio()
-    async def test_get_serial_number(self) -> None:
-        """Test get serial number from hardware."""
-        with aioresponses() as mock_keenergy_api:
-            mock_keenergy_api.post(
-                "http://mocked-host/deviceControl?action=getDeviceInfo",
-                payload=[
-                    {
-                        "ret": "OK",
-                        "revNo": 2,
-                        "orderNo": 12345678,
-                        "serNo": 12345678,
-                        "name": "MOCKED-NAME",
-                        "variantNo": 0,
-                    },
-                ],
-                headers={"Content-Type": "application/json;charset=utf-8"},
-            )
-
-            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
-            response: int = await client.device.get_serial_number()
-
-            assert isinstance(response, int)
-            assert response == 12345678  # noqa: PLR2004
-
-            mock_keenergy_api.assert_called_once_with(
-                url="http://mocked-host/deviceControl?action=getDeviceInfo",
-                method="POST",
-                ssl=False,
-            )
-
-    @pytest.mark.asyncio()
-    async def test_get_revision_number(self) -> None:
-        """Test get revision number from hardware."""
-        with aioresponses() as mock_keenergy_api:
-            mock_keenergy_api.post(
-                "http://mocked-host/deviceControl?action=getDeviceInfo",
-                payload=[
-                    {
-                        "ret": "OK",
-                        "revNo": 2,
-                        "orderNo": 12345678,
-                        "serNo": 12345678,
-                        "name": "MOCKED-NAME",
-                        "variantNo": 0,
-                    },
-                ],
-                headers={"Content-Type": "application/json;charset=utf-8"},
-            )
-
-            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
-            data: int = await client.device.get_revision_number()
-
-            assert isinstance(data, int)
-            assert data == 2  # noqa: PLR2004
-
-            mock_keenergy_api.assert_called_once_with(
-                url="http://mocked-host/deviceControl?action=getDeviceInfo",
-                method="POST",
-                ssl=False,
-            )
-
-    @pytest.mark.asyncio()
-    async def test_get_variant_number(self) -> None:
-        """Test get variant number from hardware."""
-        with aioresponses() as mock_keenergy_api:
-            mock_keenergy_api.post(
-                "http://mocked-host/deviceControl?action=getDeviceInfo",
-                payload=[
-                    {
-                        "ret": "OK",
-                        "revNo": 2,
-                        "orderNo": 12345678,
-                        "serNo": 12345678,
-                        "name": "MOCKED-NAME",
-                        "variantNo": 0,
-                    },
-                ],
-                headers={"Content-Type": "application/json;charset=utf-8"},
-            )
-
-            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
-            data: int = await client.device.get_variant_number()
-
-            assert isinstance(data, int)
-            assert data == 0
-
-            mock_keenergy_api.assert_called_once_with(
-                url="http://mocked-host/deviceControl?action=getDeviceInfo",
-                method="POST",
-                ssl=False,
-            )
-
-    @pytest.mark.asyncio()
-    async def test_get_system_info(self) -> None:
-        """Test get system information."""
-        with aioresponses() as mock_keenergy_api:
-            mock_keenergy_api.post(
-                "http://mocked-host/swupdate?action=getSystemInstalled",
-                payload=[
-                    {
-                        "ret": "OK",
-                        "name": "KeEnergy.MTec",
-                        "version": "2.2.2",
-                    },
-                ],
-                headers={"Content-Type": "application/json;charset=utf-8"},
-            )
-
-            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
-            data: dict[str, Any] = await client.device.get_system_info()
-
-            assert isinstance(data, dict)
-            assert data == {
-                "name": "KeEnergy.MTec",
-                "version": "2.2.2",
-            }
-
-            mock_keenergy_api.assert_called_once_with(
-                url="http://mocked-host/swupdate?action=getSystemInstalled",
-                method="POST",
-                ssl=False,
-            )
-
-
-class TestOptionSection:
+class TestSystemSection:
     @pytest.mark.asyncio()
     async def test_get_positions(self) -> None:
         """Test get positions for heat pumps, heating circuits and hot water tanks."""
@@ -256,7 +66,7 @@ class TestOptionSection:
             )
 
             client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
-            response: Position = await client.options.get_positions()
+            response: Position = await client.system.get_positions()
 
             assert isinstance(response, Position)
             assert response.heat_pump == 2  # noqa: PLR2004
@@ -270,6 +80,74 @@ class TestOptionSection:
                     '{"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHeatingCircuits", "attr": "1"}, '
                     '{"name": "APPL.CtrlAppl.sParam.options.systemNumberOfHotWaterTanks", "attr": "1"}]'
                 ),
+                method="POST",
+                ssl=False,
+            )
+
+    @pytest.mark.asyncio()
+    async def test_get_info(self) -> None:
+        """Test get system information."""
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/swupdate?action=getSystemInstalled",
+                payload=[
+                    {
+                        "ret": "OK",
+                        "name": "KeEnergy.MTec",
+                        "version": "2.2.2",
+                    },
+                ],
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
+
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+            data: dict[str, Any] = await client.system.get_info()
+
+            assert isinstance(data, dict)
+            assert data == {
+                "name": "KeEnergy.MTec",
+                "version": "2.2.2",
+            }
+
+            mock_keenergy_api.assert_called_once_with(
+                url="http://mocked-host/swupdate?action=getSystemInstalled",
+                method="POST",
+                ssl=False,
+            )
+
+    @pytest.mark.asyncio()
+    async def test_device_info(self) -> None:
+        """Test get device info from hardware."""
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/deviceControl?action=getDeviceInfo",
+                payload=[
+                    {
+                        "ret": "OK",
+                        "revNo": 2,
+                        "orderNo": 12345678,
+                        "serNo": 12345678,
+                        "name": "MOCKED-NAME",
+                        "variantNo": 0,
+                    },
+                ],
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
+
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+            response: dict[str, Any] = await client.system.get_device_info()
+
+            assert isinstance(response, dict)
+            assert response == {
+                "revNo": 2,
+                "orderNo": 12345678,
+                "serNo": 12345678,
+                "name": "MOCKED-NAME",
+                "variantNo": 0,
+            }
+
+            mock_keenergy_api.assert_called_once_with(
+                url="http://mocked-host/deviceControl?action=getDeviceInfo",
                 method="POST",
                 ssl=False,
             )
@@ -298,7 +176,7 @@ class TestOptionSection:
             )
 
             client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
-            data: int = await client.options.get_number_of_hot_water_tanks()
+            data: int = await client.system.get_number_of_hot_water_tanks()
 
             assert isinstance(data, int)
             assert data == 2  # noqa: PLR2004
@@ -334,7 +212,7 @@ class TestOptionSection:
             )
 
             client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
-            data: int = await client.options.get_number_of_heat_pumps()
+            data: int = await client.system.get_number_of_heat_pumps()
 
             assert isinstance(data, int)
             assert data == 1
@@ -370,7 +248,7 @@ class TestOptionSection:
             )
 
             client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
-            data: int = await client.options.get_number_of_heating_circuits()
+            data: int = await client.system.get_number_of_heating_circuits()
 
             assert isinstance(data, int)
             assert data == 3  # noqa: PLR2004
@@ -381,6 +259,104 @@ class TestOptionSection:
                 method="POST",
                 ssl=False,
             )
+
+    @pytest.mark.asyncio()
+    @pytest.mark.parametrize(
+        ("human_readable", "payload_value", "expected_value"),
+        [(True, 1, "summer"), (False, 2, 2)],
+    )
+    async def test_get_operating_mode(
+        self,
+        human_readable: bool,  # noqa: FBT001
+        payload_value: int,
+        expected_value: str,
+    ) -> None:
+        """Test get operating mode for system."""
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/var/readWriteVars",
+                payload=[
+                    {
+                        "attributes": {
+                            "formatId": "fmtOperatingMode",
+                            "longText": "Operating mode",
+                            "lowerLimit": "-1",
+                            "unitId": "Enum",
+                            "upperLimit": "4",
+                        },
+                        "name": "APPL.CtrlAppl.sParam.param.operatingMode",
+                        "value": f"{payload_value}",
+                    },
+                ],
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
+
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+            data: int | str = await client.system.get_operating_mode(human_readable=human_readable)
+
+            assert isinstance(data, (int | str))
+            assert data == expected_value
+
+            mock_keenergy_api.assert_called_once_with(
+                url="http://mocked-host/var/readWriteVars",
+                data='[{"name": "APPL.CtrlAppl.sParam.param.operatingMode", "attr": "1"}]',
+                method="POST",
+                ssl=False,
+            )
+
+    @pytest.mark.asyncio()
+    @pytest.mark.parametrize(
+        ("operating_mode", "expected_value"),
+        [("summer", 1), ("AUTO_HEAT", 2), (SystemOperatingMode.AUTO_COOL.value, 3)],
+    )
+    async def test_set_operating_mode(
+        self,
+        operating_mode: int | str,
+        expected_value: int,
+    ) -> None:
+        """Test set operating mode for system."""
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/var/readWriteVars?action=set",
+                payload={},
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
+
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+            await client.system.set_operating_mode(operating_mode)
+
+            mock_keenergy_api.assert_called_once_with(
+                url="http://mocked-host/var/readWriteVars?action=set",
+                data='[{"name": "APPL.CtrlAppl.sParam.param.operatingMode", "value": "%s"}]' % expected_value,
+                method="POST",
+                ssl=False,
+            )
+
+    @pytest.mark.asyncio()
+    @pytest.mark.parametrize(
+        "operating_mode",
+        ["INVALID"],
+    )
+    async def test_set_invalid_operating_mode(
+        self,
+        operating_mode: int | str,
+    ) -> None:
+        """Test set operating mode for system."""
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/var/readWriteVars?action=set",
+                payload={},
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
+
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+
+            with pytest.raises(APIError) as error:
+                await client.system.set_operating_mode(operating_mode)
+
+            assert str(error.value) == "Invalid operating mode!"
+
+            mock_keenergy_api.assert_not_called()
 
 
 class TestHotWaterTankSection:
@@ -859,7 +835,7 @@ class TestHeatPumpSection:
             )
 
             client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
-            data: int | str = await client.heat_pump.get_status(human_readable=human_readable)
+            data: int | str = await client.heat_pump.get_state(human_readable=human_readable)
 
             assert isinstance(data, (int | str))
             assert data == expected_value
@@ -1247,6 +1223,105 @@ class TestHeatPumpSection:
                 method="POST",
                 ssl=False,
             )
+
+    @pytest.mark.asyncio()
+    @pytest.mark.parametrize(
+        ("human_readable", "payload_value", "expected_value"),
+        [(True, 0, "off"), (False, 2, 2)],
+    )
+    async def test_get_operating_mode(
+        self,
+        human_readable: bool,  # noqa: FBT001
+        payload_value: int,
+        expected_value: str,
+    ) -> None:
+        """Test get operating mode for heat pump."""
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/var/readWriteVars",
+                payload=[
+                    {
+                        "attributes": {
+                            "formatId": "fmtHPOpMode",
+                            "longText": "Operating mode",
+                            "lowerLimit": "0",
+                            "unitId": "Enum",
+                            "upperLimit": "2",
+                        },
+                        "name": "APPL.CtrlAppl.sParam.heatpump[0].param.operatingMode",
+                        "value": f"{payload_value}",
+                    },
+                ],
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
+
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+            data: int | str = await client.heat_pump.get_operating_mode(human_readable=human_readable)
+
+            assert isinstance(data, (int | str))
+            assert data == expected_value
+
+            mock_keenergy_api.assert_called_once_with(
+                url="http://mocked-host/var/readWriteVars",
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].param.operatingMode", "attr": "1"}]',
+                method="POST",
+                ssl=False,
+            )
+
+    @pytest.mark.asyncio()
+    @pytest.mark.parametrize(
+        ("operating_mode", "expected_value"),
+        [("off", 0), ("ON", 1), (HeatPumpOperatingMode.BACKUP.value, 2)],
+    )
+    async def test_set_operating_mode(
+        self,
+        operating_mode: int | str,
+        expected_value: int,
+    ) -> None:
+        """Test set operating mode for system."""
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/var/readWriteVars?action=set",
+                payload={},
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
+
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+            await client.heat_pump.set_operating_mode(operating_mode)
+
+            mock_keenergy_api.assert_called_once_with(
+                url="http://mocked-host/var/readWriteVars?action=set",
+                data='[{"name": "APPL.CtrlAppl.sParam.heatpump[0].param.operatingMode", "value": "%s"}]'
+                % expected_value,
+                method="POST",
+                ssl=False,
+            )
+
+    @pytest.mark.asyncio()
+    @pytest.mark.parametrize(
+        "operating_mode",
+        ["INVALID"],
+    )
+    async def test_set_invalid_operating_mode(
+        self,
+        operating_mode: int | str,
+    ) -> None:
+        """Test set operating mode for heat pump."""
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/var/readWriteVars?action=set",
+                payload={},
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
+
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+
+            with pytest.raises(APIError) as error:
+                await client.heat_pump.set_operating_mode(operating_mode)
+
+            assert str(error.value) == "Invalid operating mode!"
+
+            mock_keenergy_api.assert_not_called()
 
 
 class TestHeatCircuitSection:
@@ -1801,6 +1876,92 @@ class TestHeatCircuitSection:
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
                 data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].values.heatRequest", "attr": "1"}]',
+                method="POST",
+                ssl=False,
+            )
+
+    @pytest.mark.parametrize(
+        ("human_readable", "payload_value", "expected_value"),
+        [
+            (True, "true", "on"),
+            (False, HeatCircuitExternalCoolRequest.ON.value, 1),
+            (True, "false", "off"),
+            (False, HeatCircuitExternalCoolRequest.OFF.value, 0),
+        ],
+    )
+    @pytest.mark.asyncio()
+    async def test_get_external_cool_request(
+        self,
+        human_readable: bool,  # noqa: FBT001
+        payload_value: str,
+        expected_value: str,
+    ) -> None:
+        """Test get external cool request for heat circuit."""
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/var/readWriteVars",
+                payload=[
+                    {
+                        "attributes": {"longText": "Ext. cool request"},
+                        "name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.external.coolRequest",
+                        "value": payload_value,
+                    },
+                ],
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
+
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+            data: int | str = await client.heat_circuit.get_external_cool_request(human_readable=human_readable)
+
+            assert isinstance(data, (int | str))
+            assert data == expected_value
+
+            mock_keenergy_api.assert_called_once_with(
+                url="http://mocked-host/var/readWriteVars",
+                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.external.coolRequest", "attr": "1"}]',
+                method="POST",
+                ssl=False,
+            )
+
+    @pytest.mark.parametrize(
+        ("human_readable", "payload_value", "expected_value"),
+        [
+            (True, "true", "on"),
+            (False, HeatCircuitExternalHeatRequest.ON.value, 1),
+            (True, "false", "off"),
+            (False, HeatCircuitExternalHeatRequest.OFF.value, 0),
+        ],
+    )
+    @pytest.mark.asyncio()
+    async def test_get_external_heat_request(
+        self,
+        human_readable: bool,  # noqa: FBT001
+        payload_value: str,
+        expected_value: str,
+    ) -> None:
+        """Test get external heat request for heat circuit."""
+        with aioresponses() as mock_keenergy_api:
+            mock_keenergy_api.post(
+                "http://mocked-host/var/readWriteVars",
+                payload=[
+                    {
+                        "attributes": {"longText": "Ext. cool request"},
+                        "name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.external.heatRequest",
+                        "value": payload_value,
+                    },
+                ],
+                headers={"Content-Type": "application/json;charset=utf-8"},
+            )
+
+            client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
+            data: int | str = await client.heat_circuit.get_external_heat_request(human_readable=human_readable)
+
+            assert isinstance(data, (int | str))
+            assert data == expected_value
+
+            mock_keenergy_api.assert_called_once_with(
+                url="http://mocked-host/var/readWriteVars",
+                data='[{"name": "APPL.CtrlAppl.sParam.heatCircuit[0].param.external.heatRequest", "attr": "1"}]',
                 method="POST",
                 ssl=False,
             )
