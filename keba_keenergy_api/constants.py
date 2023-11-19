@@ -269,7 +269,7 @@ class HeatCircuit(Enum):
         value_type=float,
         read_only=False,
     )
-    OFFSET_TEMPERATURE: Final[EndpointProperties] = EndpointProperties(
+    TEMPERATURE_OFFSET: Final[EndpointProperties] = EndpointProperties(
         "param.offsetRoomTemp",
         value_type=float,
         read_only=False,

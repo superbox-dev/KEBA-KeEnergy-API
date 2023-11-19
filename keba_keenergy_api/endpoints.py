@@ -797,21 +797,21 @@ class HeatCircuitEndpoints(BaseEndpoints):
         temperatures: list[float | None] = [temperature if position == p else None for p in range(1, position + 1)]
         await self._write_values(request={HeatCircuit.HOLIDAY_TEMPERATURE: temperatures})
 
-    async def get_offset_temperature(self, position: int | None = 1) -> float:
-        """Get offset temperature."""
+    async def get_temperature_offset(self, position: int | None = 1) -> float:
+        """Get temperature offset."""
         response: dict[str, list[Value]] = await self._read_data(
-            request=HeatCircuit.OFFSET_TEMPERATURE,
+            request=HeatCircuit.TEMPERATURE_OFFSET,
             position=position,
             extra_attributes=True,
         )
         _idx: int = position - 1 if position else 0
-        _key: str = self._get_real_key(HeatCircuit.OFFSET_TEMPERATURE)
+        _key: str = self._get_real_key(HeatCircuit.TEMPERATURE_OFFSET)
         return float(response[_key][_idx]["value"])
 
-    async def set_offset_temperature(self, offset: float, position: int = 1) -> None:
-        """Set offset temperature."""
+    async def set_temperature_offset(self, offset: float, position: int = 1) -> None:
+        """Set temperature offset."""
         offsets: list[float | None] = [offset if position == p else None for p in range(1, position + 1)]
-        await self._write_values(request={HeatCircuit.OFFSET_TEMPERATURE: offsets})
+        await self._write_values(request={HeatCircuit.TEMPERATURE_OFFSET: offsets})
 
     async def get_operating_mode(self, position: int | None = 1, *, human_readable: bool = True) -> int | str:
         """Get operating mode."""

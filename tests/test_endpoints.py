@@ -1627,8 +1627,8 @@ class TestHeatCircuitSection:
             )
 
     @pytest.mark.asyncio()
-    async def test_get_offset_temperature(self) -> None:
-        """Test get offset temperature for heat circuit."""
+    async def test_get_temperature_offset(self) -> None:
+        """Test get temperature offset for heat circuit."""
         with aioresponses() as mock_keenergy_api:
             mock_keenergy_api.post(
                 "http://mocked-host/var/readWriteVars",
@@ -1649,7 +1649,7 @@ class TestHeatCircuitSection:
             )
 
             client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
-            data: float | None = await client.heat_circuit.get_offset_temperature()
+            data: float | None = await client.heat_circuit.get_temperature_offset()
 
             assert isinstance(data, float)
             assert data == 2.0  # noqa: PLR2004
@@ -1662,8 +1662,8 @@ class TestHeatCircuitSection:
             )
 
     @pytest.mark.asyncio()
-    async def test_set_offset_temperature(self) -> None:
-        """Test set offset temperature for heat circuit."""
+    async def test_set_temperature_offset(self) -> None:
+        """Test set temperature offset for heat circuit."""
         with aioresponses() as mock_keenergy_api:
             mock_keenergy_api.post(
                 "http://mocked-host/var/readWriteVars?action=set",
@@ -1672,7 +1672,7 @@ class TestHeatCircuitSection:
             )
 
             client: KebaKeEnergyAPI = KebaKeEnergyAPI(host="mocked-host")
-            await client.heat_circuit.set_offset_temperature(2)
+            await client.heat_circuit.set_temperature_offset(2)
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars?action=set",
