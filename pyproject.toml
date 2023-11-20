@@ -53,7 +53,7 @@ lint = [
     "yamllint==1.32.0",
 ]
 tests = [
-    "aioresponses==0.7.4",
+    "aioresponses==0.7.5",
     "coverage==7.3.2",
     "coverage-badge==1.1.0",
     "pytest==7.4.3",
