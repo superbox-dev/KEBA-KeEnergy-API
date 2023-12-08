@@ -27,7 +27,7 @@ classifiers = [
 ]
 requires-python = ">= 3.10"
 dependencies = [
-    "aiohttp==3.8.5"
+    "aiohttp>=3.8.5"
 ]
 dynamic = ["version"]
 
