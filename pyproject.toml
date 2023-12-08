@@ -27,7 +27,7 @@ classifiers = [
 ]
 requires-python = ">= 3.10"
 dependencies = [
-    "aiohttp>=3.8.5"
+    "aiohttp==3.9.1"
 ]
 dynamic = ["version"]
 
@@ -53,7 +53,7 @@ lint = [
     "yamllint==1.32.0",
 ]
 tests = [
-    "aioresponses==0.7.4",
+    "aioresponses==0.7.6",
     "coverage==7.3.2",
     "coverage-badge==1.1.0",
     "pytest==7.4.3",

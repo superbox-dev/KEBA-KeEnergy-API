@@ -9,9 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.12.3] - 2023-12-08
 
-### Fixed
+### Changed
 
-- Fixed package dependencies for Home Assistant.
+- Bump aiohttp to 3.9.1
+- Bump aioresponses to 0.7.6
 
 ## [1.12.2] - 2023-11-19
 
