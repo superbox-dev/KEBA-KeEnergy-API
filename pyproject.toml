@@ -20,6 +20,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3 :: Only",
     "Operating System :: OS Independent",
     "Topic :: Software Development :: Libraries",
@@ -41,10 +42,10 @@ build = [
     "build==1.0.3",
 ]
 audit = [
-    "pip-audit==2.6.1",
+    "pip-audit==2.7.1",
 ]
 format = [
-    "black==23.11.0",
+    "black==24.2.0",
 ]
 lint = [
     "mypy==1.8.0",
@@ -70,7 +71,7 @@ write_to = "keba_keenergy_api/version.py"
 
 [tool.black]
 line-length = 120
-target-version = ["py310", "py311"]
+target-version = ["py310", "py311", "py312"]
 
 [tool.mypy]
 strict = true
