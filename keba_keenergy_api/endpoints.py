@@ -1,4 +1,5 @@
 """Retrieve hot water tank data."""
+
 import importlib
 import json
 import re

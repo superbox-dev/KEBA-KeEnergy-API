@@ -1,4 +1,5 @@
 """Client to interact with KEBA KeEnergy API."""
+
 from typing import Any
 
 from aiohttp import ClientSession

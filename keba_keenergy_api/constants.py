@@ -1,4 +1,5 @@
 """All API Constants."""
+
 from enum import Enum
 from enum import IntEnum
 from typing import Final
