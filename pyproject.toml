@@ -57,7 +57,7 @@ tests = [
     "aioresponses==0.7.6",
     "coverage==7.3.2",
     "coverage-badge==1.1.0",
-    "pytest==7.4.3",
+    "pytest==8.0.1",
     "pytest-asyncio==0.23.4",
     "pytest-cov==4.1.0",
     "pytest-xdist[psutil]==3.5.0",
