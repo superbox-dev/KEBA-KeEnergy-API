@@ -642,7 +642,7 @@ class TestHotWaterTankSection:
             data: float = await client.hot_water_tank.get_min_temperature()
 
             assert isinstance(data, float)
-            assert data == 0.0  # noqa: PLR2004
+            assert data == 0.0
 
             mock_keenergy_api.assert_called_once_with(
                 url="http://mocked-host/var/readWriteVars",
