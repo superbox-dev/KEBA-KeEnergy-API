@@ -1795,6 +1795,8 @@ class TestHeatCircuitSection:
             (False, HeatCircuitHeatRequest.OFF.value, 0),
             (True, "3", "temporary_off"),
             (False, HeatCircuitHeatRequest.TEMPORARY_OFF.value, 3),
+            (True, "5", "outdoor_temperature_off"),
+            (False, HeatCircuitHeatRequest.OUTDOOR_TEMPERATURE_OFF.value, 5),
         ],
     )
     async def test_get_heat_request(

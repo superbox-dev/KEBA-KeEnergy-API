@@ -88,6 +88,7 @@ class HeatCircuitHeatRequest(str, Enum):
     OFF: Final[str] = "0"
     ON: Final[str] = "1"
     TEMPORARY_OFF: Final[str] = "3"
+    OUTDOOR_TEMPERATURE_OFF: Final[str] = "5"
 
 
 class HeatCircuitExternalCoolRequest(str, Enum):
